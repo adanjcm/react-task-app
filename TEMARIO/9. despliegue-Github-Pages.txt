@@ -207,9 +207,21 @@ tendrian que investigar codigo de backend y como integrarle por ejemplo la posib
 
 este ejemplo solo ha sido de react.
 
+SOLUCION A ERROR (error por ancho de banda insuficiente): 
+
+error: RPC failed; curl 18 transfer closed with outstanding read data remaining
+send-pack: unexpected disconnect while reading sideband packet
+fatal: the remote end hung up unexpectedly
+Everything up-to-date
 
 
+➜  react-tasks-application git:(main) git config --global http.version HTTP/1.1    
 
+➜  react-tasks-application git:(main) git config --global http.postBuffer 157286400
+
+** luego de que se suba regresar al HTTP 2
+
+➜  react-tasks-application git:(main) git config --global http.version HTTP/2      
 
 
 
