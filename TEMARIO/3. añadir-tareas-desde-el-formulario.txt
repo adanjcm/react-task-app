@@ -1,0 +1,1194 @@
+Añadir tareas al formulario
+
+vamos a anadir una tarea dentro de la lista de tareas.
+
+para poder hacerlo necesitamos una porcion de interfaz xq hasta este momento tan solo tenemos 3 elementos que es estan mostrando pero no tengo ninguna forma de anadir una tarea o decirle al usuario que anada una tarea.
+
+// ** 1. nos vamos a App.jsx y vamos a crear un formulario y arriba del componente "TaskList",
+vamos a crear otro componente. 
+
+creamos /src/TaskForm.jsx porque va ser un componente de react por eso usa la extension .jsx 
+
+ahora no es necesario poner un <div> como contenedro, 
+xq tenemos in <form> que lo contenga todo.
+
+y dentro del form un input y un boton
+por ahora va a mostar por consola el valor 
+del input.
+
+[TaskForm.jsx]
+
+function TaskForm() {
+  return (
+    <form>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          console.log(e.target.value);
+        }}
+      />
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+
+* Navegador: 
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+----- (Escribe tu tarea) [input - placeholder]
+Guardar (Boton)
+
+* Consola, si escribo "hola" en el input me aparece asi.
+
+[ 
+    h
+    ho
+    hol
+    hola
+]
+
+ya teniendo este texto, ya estoy seguro de que estoy capturando el dato.
+voy a guardar ese valor (e.target.value) en un estado.
+
+// ** guardamos el valor en un estado
+
+importamos desde react un "useState"
+y creamos el estado, lo podemos llamar de varias maneras,
+en mi caso lo llamaremos "title" e inicialmente va hacer un ("") string vacio.
+
+const [title, setTitle] = useState('')
+y es igual a esto: const title = ''
+
+y asignamos setTitle(e.target.value)
+
+-- ahora la constante "title" tiene el valor de lo que el usuario va tipeando.
+
+[TaskForm.jsx]
+
+import { useState } from "react";
+
+function TaskForm() {
+  const [title, setTitle] = useState("");
+
+  return (
+    <form>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+      />
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+* navegador:
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+hola mundo con un estado (input) [sin dar click al boto Guardar]
+Guardar (boton)
+
+si yo quiero ver este valor me voy a las herramientas del desarrolador
+de reac en "components" y si voy a "TaskForm", 
+puedo ver:
+
+-- El estado dice esto:
+1. state: "hola mundo con un estado"
+
+Esto significa que esto se va actualizando cada vez que yo voy tipeando algo.
+voy tipeando y se va actualizando.
+
+// 3. Apartir de aqui lo que voy hacer es que cuando se ejecute el formulario voy a leer este valor (title),
+
+-- Ejecutamos el evento del formulario "onSubmit" y le voy a decir cuando se ejecute onSubmit voy a ejecutar una funcion, 
+esta funcion la creamos por aparte y la llamamos "handleSubmit" (maneja el evenvo submit del formulario),
+
+cuando se ejecute ese handleSubmit quiero ver por consola lo que tenga la 
+variable "title" hasta este momento.
+y dentro del "form" en el evento le colocamos la funcion "handleSubmit"
+
+<form onSubmit={handleSubmit} >
+
+
+import { useState } from "react";
+
+function TaskForm() {
+  const [title, setTitle] = useState("");
+
+  const handleSubmit = () => {
+    console.log(title);
+  }
+
+  return (
+    <form onSubmit={handleSubmit} >
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+      />
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+* navegador:
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+hola mundo con un estado (input) [y luego le doy click al boto Guardar]
+Guardar (boton)
+
+* Aparece el texto en el input y luego desaparece el texto del input (aparece el texto despues de actualizarse la pagina se elimina),
+y en consola no aparece nada.
+
+y la razon de que se elimine es que por defecto los formularios 
+reinician el navegador,
+
+asi que para cancelar ese comportamiento,
+voy a decirle a la funcion "handleSubmit" vas a recibier un objeto event (e)
+y de ese objeto event utilizas un metodo llamado "e.preventDefault"
+que es un evento que cancela el comportamiento por defecto.
+
+const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(title);
+  };
+
+* ahora en el navegador si pongo en el mundo "hola mundo" y
+le click al boton Guardar.
+en consola ya me aparece ese texto.
+
+[
+    hola mundo
+]
+
+Es decir cualquier cosa que yo tipee se guarda en el estado (title)
+y cuando yo envie (click en el boton Guardar),
+me muestra lo que tiene ese estado.
+
+-- con esto ya tengo el valor del input en esta constate (title)
+
+// 3. anadir ese valor del input en esta constate (title) a la lista de tareas
+
+-- Es este caso es muy impotante que entendamos que en este componente
+"TaskForm" no existe no existe el arreglo de tareas (tasks.js),
+de hecho ese dato de las lista de tareas tan solo esta en el componente
+"TaskList",
+
+con esto le voy a dar una idea de como funciona nuestra aplicacion hasta este momento con un diagrama bastante sencillo. 
+
+Veamoslo de esta forma:
+    hasta este momento yo tengo unos cuantos componentes,
+    de hecho 3 componentes (App, TaskForm, TaskList),
+
+    claro tambien tenemos (Main) pero este es el que inicia todo, asi que no lo vamos a contar.
+
+    "Main" lo que hace es iniciar con el componente <App />
+
+    y "App" lo que hace es llamar a <TaskForm /> y <TaskList /> 
+    
+    y dentro de "TaskForm" esta lo que hemos creado,
+
+    y "TaskList" ya lo habiamos creado en la seccion anterior. 
+
+-- Lo que estamos viendo es lo que se conoce como un "arbol de componentes o ui component tree"
+
+para poder entenderlo veamoslo dentro de un navegador,
+y primero vamos a estar colocando un componente y 
+este componente y es el componente "App",
+
+ese componente "App" adentro contiene 2 componentes
+
+un "TaskForm" 
+y debajo un "TaskList" 
+
+* es muy importante entender esta estructura que estamos viendo. 
+
+ahora cuando trabajamos con el "TaskList" este contiene un dato, contiene un arreglo de tareas (tasks) que solo esta disponible en el "TaskList" de tal forma que el "TaskForm" no puede acceder a este arreglo y el "App" tampoco.
+
+-- con el objetivo que este "TaskForm" pueda acceder a este arreglo de tareas ([]),
+tenemos que subirlo un nivel, es decir que el que va a tener el arreglo va hacer "App" y de esta forma lo que vamos hacer luego es que desde "App" sera pasarle ese arreglo a "TaskForm" y tambien vamos a pasarselo a "TaskList"
+
+de esta forma nosotros vamos a poder luego desde "TaskForm" y "TaskList" acceder al arreglo,
+porque va a ver un solo componente que lo va a contener (App).
+
+En "TaskList" tiene una propiedad "tasks"
+    [ const [tasks, setTasks] = useState([]); ]
+
+y aqui esta asignado esa propiedad "tasks" aqui adentro:
+
+  useEffect(() => {
+    setTasks(data);
+  }, []);
+
+
+* Vamos a cortar esto: 
+
+
+// ** y Nos vamos al componente "App" y le voy a colocar dentro del componente "App" (antes HolaMundo)
+
+Con esto "App" tiene el arreglo de tareas y este en esta momento tan solo le estamos asignado(data)
+
+y que es (data),
+import { tasks as data } from "./tasks";
+me voy a "TaskList" y le digo que esta importacion de tareas [ import { tasks as data } from "./tasks"; ]
+lo muevo al componente "App". 
+
+ahora de este archivo necesito (data),
+de esta forma ahora lo unico que estoy haciendo es asignarle este arreglo de tareas (tasks) en la lista de tareas que habiamo creado en ese arreglo.
+
+Entonces "TaskList" ya no tiene el arreglo de tareas y por lo tanto ya no necesita 
+(import { useState, useEffect } from "react";) 
+e incluso esto en 'gris' porque me esta diciendo ya no necesitas estos 2 valores 
+
+y quedaria de esta forma el "TaskList",
+ahora el asunto que "TaskList" necesita recorrer las tareas para poder mostrarlas aqui,
+
+lo unico que vamos a hacer es que desde "App", ok,
+yo tengo el arreglo de tareas se lo voy se lo voy a pasar 
+a "TaskList" como un (prop)
+
+entonces quedaria en "TaskList" va a recibir un o los (props)
+
+function TaskList(props) {...}
+
+y desde los (props) va a recibir los "tasks"
+
+y para hacer funcionar vamos a "App" 
+ese <TaskList> te voy a pasar una propiedad llamada "taks",
+y el valor de esa propiedad va hacer justamente el arreglo de tareas (taks)
+
+[ <TaskList tasks={tasks} /> ]
+
+* ahora si vamos al navagador vemos que da un error en consola 
+[App.jsx:8 Uncaught ReferenceError: useState is not defined
+    at App ]
+
+que nos dice el "useState" no esta definido en "App",
+pero puedo importarlo, aqui si los necesito.
+[ import { useState, useEffect } from "react"; ]
+
+
+* ahora regreso al navegador
+obtengo otro error 
+[
+    Uncaught ReferenceError: tasks is not defined
+    at TaskList
+]
+
+y es muy importante entender estos errores,
+es bastante bueno para tener practica,
+y pueden ver que ahora me dice que el error esta en
+"TaskList" y el error me dicie que "tasks" no existe,
+y es porque debe ser ((props.tasks.length === 0)) 
+en lugar de [tasks.length === 0)]
+
+* y lleva (props.taks) porque (props) es todo el objeto y de ah tomamos la propieda (tasks) que en este caso es el arreglo.
+
+Es el (props) que recibimos de "App" 
+[<TaskList tasks={tasks} />]
+
+** si regresamos al navegador
+la aplicacion nuevamente esta funcionando,
+sin errores.
+
+** De echo no tengo que colocar (props.tasks)
+-- tambien puedo estructurarlo y decirle:
+    desde (props) quiero extraer "tasks" [({tasks})]
+    y ya me evito colocar (props.tasks),
+    
+    simplemente lo pongo asi (tasks.length === 0)
+
+    Nota: ({tasks}) es el nombre del (prop), puede ser ({tasks2}) y tambien cambiarlo en "App" 
+    [<TaskList tasks2={tasks} />] y sigue funcionando porque lo que toma es el valor del arreglo que tiene asignado (constante tasks - el atributo) de "App".
+
+    Ademas en "TaskList" no se tiene que importar nada de "App",
+    solo con el prop que recibe (({tasks})) desde "App" lo hace todo. ya tiene el arreglo listo para usarse, dentro de ese prop.
+
+
+* regreso al navegador:
+y me da el mismo resultado sin errores,
+simplemente me he ahorrado unas cuantas lineas de codigo.
+
+
+*** Todo lo que hemos hecho es para que "TaskForm" ahora pueda acceder al arreglo,
+entonces lo que va a hacer "App", 
+le puedo pasar el arreglo a "TaskForm" y que el lo altere,
+pero no es el juego que utiliza React,
+
+-- React me dice para poder anadir algo de este arreglo (task) de "App", lo que voy a hacer es crear una funcin dento de "App"
+la podemos llamar "CreateTask",
+
+y esta funcio CreateTask se la vamos a pasar a "TaskForm"
+y "TaskForm" le va dar un dato y se lo va a devolver a "App"
+entonces "App" lo que va hacer con este "CreateTask" 
+es llenar este arreglo (tasks).
+
+De nuevo "App" le va a pasar un "CreateTask" a una funcion "TaskForm" y "TaskForm" lo va a ejecutar le va insertat datos
+y al ejecutar el dato, esto va a retornar a "App" (al arreglo [])
+y como esta al mismo nivel va a poder guardar un dato dentro de este arreglo (tasks)
+
+
+*** Primero nos vamos a "App" y creamos la funcion createTask
+y lo unico que va a hacer es que va a recibir una nueva tarea 
+llamemosla "task" (task),
+
+que en realidad yo espero un objeto de javascript ({task})
+y luego puede ser que este objeto luego lo va a anadir dentro de este arreglo (tasks)
+
+* Para poder anadirlo simplemente le digo ok, 
+vamos a copiar todos los elementos que tenga "tasks"
+entonces creo un arreglo nuevo y copio ( [...tasks] )
+y luego le digo que voy anadirle este objeto ({task}) aqui adentro ( [...tasks, task] )
+
+si no entienden esta sintaxis ( [...tasks, task] )
+
+vemos un ejemplo mas sencillo, 
+por ejemplo si yo tengo: 
+
+una constante  a que un arreglo con valores 1, 2, 3
+y si quiero a esta constante asignarle algo 
+nuevo, lo que tengo que hacer es copiar este arreglo,
+copia todos los valores de a ([...a]),
+
+con estos tres puntos ([...]) es como decir ok,
+copia todos los elementos que tenga "a" 
+y luego coloco una coma (,),
+y luego coloco el cuarto/quinto elemento o lo que quieran,
+([..., 4,5,6])
+luego doy un enter,
+y esto me retorna un nuevo arreglo con los nuevos
+elementos, 
+pero sin alterar el arreglo original "a",
+si doy enter, me retorna el arreglo original,
+
+solo me retorna un nuevo arreglo ([1,2,3,4,5,6])
+
+[
+const a = [1,2,3]
+undefined
+[...a,4,5,6]          --> copia arreglo a y anade estos elementos
+(6) [1, 2, 3, 4, 5, 6]  --> solo retorna un nuevo arreglo
+a                     --> no modifica arreglo original
+(3) [1, 2, 3]
+
+]
+
+** Con esto en "App":
+
+  function createTask(task) {
+    [...tasks, task]
+  }
+
+esta diciendo copia todas las tareas (todo el arreglo tasks en constante que guarda el arreglo original tasks.js)
+y luego anade una tarea nueva (,task)
+
+una vez que tengas ese nuevo arreglo ([...tasks, task]),
+lo que vamos a hacer es asignarselo a "setTasks"
+
+le digo vas a llamar setTasks y le vas a asignar este nuevo arreglo. [le va a agreagar al arreglo tasks, lo que reciba como parametro y eso dara un nuevo arreglo con el dato agregagado (u objeto que reciba)]
+
+  function createTask(task) {
+    setTasks([...tasks, task])
+  }
+
+* Esta funcion no le ha asignado en "App",
+lo que vamos hacer es pasarsela a "<TaskForm />" 
+te voy a pasar una propiedad llamada 'createTask',
+y en lugar de pasarle un numero o string o cualquier otro valor 
+como un booleano,
+
+le voy a pasar esta funcion "createTask"
+[ <TaskForm createTask={createTask} /> ]
+
+** ahora me voy a "TaskForm" y le digo estas recibiendo
+una propiedad y se llama ({createTask})
+[ function TaskForm({createTask}) { ...} ]
+
+y ahora en lugar de ver por consola el titulo 
+
+[ -- original ---
+
+import { useState } from "react";
+
+function TaskForm({createTask}) {
+  const [title, setTitle] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(title); --> esto es un string que se muestra 
+                            en consola
+  };    
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+      />
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+]
+
+** Vamos anadir este (createTask) al arreglo.
+ahora es muy importante que nosotros creemos un objeto de tarea (task) que se parezca a todo esto:
+
+[  
+    tasks.js
+
+const tasks = [
+  {
+    id: 0,
+    title: "mi primer tarea",
+    description: "mi primer tarea",
+  }
+]
+
+En este momento solo tenemos el titulo (title)
+[ const [title, setTitle] = useState(""); ]
+
+-- lo que vamos hacer en lugar del console.log(),
+creamos una constante "newTask" que va hacer un objeto
+y el valor de title sera el valor que tengamos hasta este momento en el estado (title)
+
+const newTask = {
+      title: title,
+}
+
+y esto se puede resumir de esta forma:
+
+[
+
+function TaskForm({ createTask }) {
+  const [title, setTitle] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newTask = {
+      title,
+    };
+  };
+
+]
+
+** ahora si muestro por consola este "newTask"
+
+[
+
+import { useState } from "react";
+
+function TaskForm({ createTask }) {
+  const [title, setTitle] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newTask = {
+      title,
+    };
+    console.log(newTask);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+      />
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+]
+
+** navegador
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+tarea nueva (input) --> le doy click al boton (guardar)
+Guardar (boton)
+
+En consola vemos que ya no es un string, 
+si no un objeto con la propiedad "title":
+
+[
+ {title: 'tarea nueva'}   
+]
+
+** Entonces de esta forma ya tengo un objeto que puedo anadir
+al arreglo de objetos (arreglo de objeto de tasks.js), 
+es decir puedo anadir un nuevo objeto a este arreglo de objetos 
+[taks.js]
+
+De esta forma le digo en lugar de estar mostrandomelo por consola el objeto,
+
+vas a darselo como valor a esta funcion que estas recibiendo function TaskForm({ createTask })) {},
+
+entonces le digo vas a ajecutar "createTask" 
+y le vas a dar como valor el "newTask"  [el objeto que acabamos de crear]
+
+[
+
+import { useState } from "react";
+
+function TaskForm({ createTask }) {
+  const [title, setTitle] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newTask = {
+      title,
+    };
+    createTask(newTask);    --> funcion y pasamos el objeto
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+      />
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+]
+
+** lo unico que hace esta funcion (createTask(newTask);)
+es que se esta ejecutando, le estan pasando un valor 
+pero como esta funcion justamente no esta creada aqui,
+sino que esta creada en "App",
+
+es como si se estuviera llamando aqui,
+[ "App"
+
+  function createTask(task) {
+    setTasks([...tasks, task]);
+  }
+]
+
+Entonces le estan pasando el valor "newTask" que seria este valor de aqui, en (task) de "App"
+
+[ "TaskForm"
+
+const newTask = {
+      title,
+    };
+]
+
+y se lo esta pasando aqui (task)
+
+[ "App"
+
+function createTask(task) {
+    setTasks([...tasks, task]);
+  }
+
+]
+
+y como esta funcion (function createTask(task))
+si tiene acceso al arreglo (task el estado),
+
+entonces esta funcion puede alterarlo 
+( setTasks([...tasks, task]); )
+
+[
+function createTask(task) {
+    setTasks([...tasks, task]);
+  }
+]
+
+es decir esta copiando los datos que tiene "tasks" y esta recibiendo el valor (task) que este caso recibe "newTask" de "TaskForm",
+
+-- entonces es de esta como conectamos el componente "App" con el componente "TaskForm" simplemente a travez de un (prop),
+en este caso ({ createTask })
+
+[
+    function TaskForm({ createTask }) {}
+]
+
+** y con esto ya esta anadiendo datos 
+
+De hecho si voy a la aplicacion, es decir a la pagina:
+
+Inicialmente tenemos 3 tareas:
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+Escribe tu tarea (input)  Guardar (boton)
+
+* si le digo, escribo en el input: tarea cuarta,
+click en el boton guardar.
+
+y ya me aparece la (tarea cuarta)
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+tarea cuarta
+
+Escribe tu tarea (input)  Guardar (boton)
+
+* en este caso en consola me da un "warning",
+porque esta tarea no tiene ningun "id" y ninguna "description
+en "TaskForm".
+
+[
+Warning: Each child in a list should have a unique "key" prop.
+]
+
+En "TaskForm" puedo anadir algo de ejemplo,
+un id=4, y una description: "algo nuevo" 
+
+[   "TaskForm"
+
+import { useState } from "react";
+
+function TaskForm({ createTask }) {
+  const [title, setTitle] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newTask = {
+      title,
+      id: 4,
+      description: "algo nuevo",
+    };
+    createTask(newTask);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+      />
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+]
+
+** ahora en la pagina/aplicacion si escribo en el input: tarea cuarta y click en el boton Guardar.
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+tarea cuarta
+algo nuevo
+
+tarea cuarta (input)  Guardar (boton)
+
+* y en consola ya no me marca error.
+
+El asunto que cada vez que cree una tarea nueva siempre
+van a tener el id=4 todos.
+
+y si anado una tarea quinta: 
+
+** ahora en la pagina/aplicacion si escribo en el input: tarea quinta y click en el boton Guardar.
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+tarea cuarta
+algo nuevo
+
+tarea quinta
+algo nuevo
+
+tarea quinta (input) Guardar (boton) 
+
+* pero en consola me manda nuevamente el warning porque la quinta tarea tambien tiene el id=4
+
+[
+Warning: Encountered two children with the same key, `4`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+]
+
+// ** Entonces para solucionar este caso de los "ids",
+lo que voy a hacer es colocarle en la propiedad "id" del objeto
+le colocamos la longitud del arreglo. 
+
+Es decir si el arreglo tiene 3 elementos, va a ser 3.
+si tiene 4 va a ser 4, y se va incrementando de la manera en que mas elementos sean anadidos al arreglo,
+
+el asunto es que en este "TaskForm" yo no tengo acceso al arreglo, entonces lo que vamos a hacer es que esta funcion "createTask" va a recibir una nueva tarea (newTask),
+
+pero no va a contener ninguno de estos datos,
+de hecho eliminamos el objeto newTask
+
+y lo que voy a hacer es que este "createTask" solo va a recibir
+un titulo (title) y una tarea (task)
+
+Entonces a (createTask(title);) le estoy pasando un "string",
+
+Hago esto porque vengo ahora al componente "App" 
+y le digo la funcion "createTask" ya no esta recibiendo un objeto 
+[
+  function createTask(task) {
+    setTasks([...tasks, task]);
+  }    
+]
+
+tan solo esta recibiendo un "string" que es un titulo (title),
+entonces un mejor nombre seria para la funcion y el parametro 
+[ createTask(taskTitle) ] porque tan solo es un "string"
+
+entonces no puedo pasarle "taskTitle" porque seria concatenar un objeto (tasks) con un string (taskTitle)
+
+[ 
+setTasks([...tasks, taskTitle]);    
+]
+
+y es aqui donde voy a definir el objeto nuevo,
+le voy a decir te voy a pasar como title el "taskTitle" 
+y luego id=4, y description sera "nueva tarea" por ahora.
+
+[ "App"
+
+  function createTask(taskTitle) {
+    setTasks([
+      ...tasks,
+      {
+        title: taskTitle,
+        id: 4,
+        description: "nueva tarea",
+      },
+    ]);
+  }
+]
+
+Si se dan cuenta estoy haciendo lo mismo que antes,
+ahora en lugar de crear la nueva tarea en el "TaskForm",
+lo estoy creando aqui en el "App",
+
+** navegador:
+
+si pongo en el input: tarea cuarta y click boton Guardar (form)
+
+* se crea la cuarta tarea 
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+tarea cuarta
+nueva tarea
+
+tarea cuarta (input) Guardar (boton)
+
+** ahora si creo la quinta tarea,
+me aparece la tarea quinta, 
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+tarea cuarta
+nueva tarea
+
+tarea quinta
+nueva tarea
+
+tarea quinta (input) Guardar (boton)
+
+y en consola tengo el mismo error, de que tiene la misma llave/id (4)
+
+[
+Warning: Encountered two children with the same key, `4`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+]
+
+// ** Pero ahora le puedo decir para quitar el error,
+en lugar de id:4, cada vez que creo una tarea nueva vas a utilizar el arreglo de las tareas (tasks), utiliza su longitud (length)
+
+[ "App"
+
+  function createTask(taskTitle) {
+    setTasks([
+      ...tasks,
+      {
+        title: taskTitle,
+        id: tasks.length, (3)
+        description: "nueva tarea",
+      },
+    ]);
+  }
+]
+
+** esto que es lo que hace?
+inicialmente nuestra aplicacion tiene 3 elementos (tasks.js) [ids 0,1,2]
+entonces la longitud de las tares es 3,
+es decir (id:3),
+
+pero cuando cuando se crea una nueva tarea lo que va a hacer 
+es colocarle como id el numero 3 (la longitud del arreglo)
+
+si se esta una cuarta tarea va a colocarle (id:4)
+y asi sucesivamente.
+
+y esto va a ir cambiando a medida que cambia.
+
+** navegador
+
+escribo en el input: cuarta tarea y click boton Guardar
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+cuarta tarea
+nueva tarea
+
+cuarta tarea (input) Guardar (boton)
+
+** le doy una quinta tarea, Guardar
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+cuarta tarea
+nueva tarea
+
+quinta tarea
+nueva tarea
+
+quinta tarea (input) Guardar (boton)
+
+* y se agrega la quinta tarea, 
+y ya no marca error en consola.
+
+algo interesante, si vamos a las herramientas 
+en consola, y vemos los componentes de react
+
+y si vamos a "TaskList" y vemos la estructura,
+en este caso vamos a ver que tenemos un estado (tasks)
+y podemos ver que estan el id 0, 1, 2, 3, 4,
+pero si anado algo nuevo en el input,
+
+input: sexta tarea,
+
+me anada la sexta tarea en el estado (tasks)
+
+[
+props
+
+
+tasks:[{…}, {…}, {…}, {…}, {…}, {…}]
+
+    0:{description: "mi primer tarea", id: 0, title: "mi …}
+    1:{description: "mi segunda tarea", id: 1, title: "mi…}
+    2:{description: "mi tercer tarea", id: 2, title: "mi …}
+    3:{description: "nueva tarea", id: 3, title: "cuarta …}
+    4:{description: "nueva tarea", id: 4, title: "quinta …}
+    5:{description: "nueva tarea", id: 5, title: "sexta t…}
+    new entry
+    new entry: "" 
+]
+
+me anade la sexta tarea con el id:5,
+porque hasta en ese momento la longitud de arreglo 
+eran 5 elementos.
+
+[
+description:"nueva tarea"
+id:5
+title:"sexta tarea"
+
+new entry: ""
+]
+
+pueden ver en description coloca "nueva tarea siempre".
+* esto lo podemos modificar luego *
+
+Lo importante es saber que ya estamos guardando la tarea.
+
+Tan solo recuerden que el arreglo empieza en 0.
+
+no hay problema si refrescamos la pagina pueden ver que hay 3 elementos:
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+Escribe tu tarea (input) Guardar (boton)
+
+
+[ consola - component - TaskList
+props
+
+tasks:[{…}, {…}, {…}, {…}, {…}, {…}]
+
+    0:{description: "mi primer tarea", id: 0, title: "mi …}
+    1:{description: "mi segunda tarea", id: 1, title: "mi…}
+    2:{description: "mi tercer tarea", id: 2, title: "mi …}
+    
+    new entry
+    new entry: "" 
+]
+
+* si creo una nueva tarea seria id:3
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+cuarta tarea
+nueva tarea
+
+cuarta tarea (input) Guardar (Boton)
+
+[
+{
+  "tasks": [
+    "{description: \"mi primer tarea\", id: 0, title: \"mi …}",
+    "{description: \"mi segunda tarea\", id: 1, title: \"mi…}",
+    "{description: \"mi tercer tarea\", id: 2, title: \"mi …}",
+    "{description: \"nueva tarea\", id: 3, title: \"cuarta …}"
+  ]
+}    
+]
+
+si creo otra tarea seria id:4 y asi sucesivamente.
+
+Listo de esta forma ya estamos creando datos.
+
+en la siguiente seccion mejoraremos esta interfaz,
+separando estos componentes de una  forma mas ordenada.
+
+----------------------------------------------------------
+[App.jsx]
+
+import TaskForm from "./TaskForm";
+import TaskList from "./TaskList";
+import { tasks as data } from "./tasks";
+import { useState, useEffect } from "react";
+
+function App() {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    setTasks(data);
+  }, []);
+
+  function createTask(taskTitle) {
+    setTasks([
+      ...tasks,
+      {
+        title: taskTitle,
+        id: tasks.length,
+        description: "nueva tarea",
+      },
+    ]);
+  }
+
+  return (
+    <div>
+      <TaskList tasks={tasks} />
+      <TaskForm createTask={createTask} />
+    </div>
+  );
+}
+
+export default App;
+
+----------------------------------------------------------
+[TaskList.jsx]
+
+function TaskList({ tasks }) {
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (
+        <div key={task.id}>
+          <h1>{task.title}</h1>
+          <p>{task.description}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+----------------------------------------------------------
+[TaskForm.jsx]
+
+import { useState } from "react";
+
+function TaskForm({ createTask }) {
+  const [title, setTitle] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createTask(title);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+      />
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+----------------------------------------------------------
+principal (index)
+[main.jsx]
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+----------------------------------------------------------
+lista de tareas
+[tasks.js]
+
+export const tasks = [
+  {
+    id: 0,
+    title: "mi primer tarea",
+    description: "mi primer tarea",
+  },
+  {
+    id: 1,
+    title: "mi segunda tarea",
+    description: "mi segunda tarea",
+  },
+  {
+    id: 2,
+    title: "mi tercer tarea",
+    description: "mi tercer tarea",
+  },
+];
+
+----------------------------------------------------------

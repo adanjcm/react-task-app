@@ -1,0 +1,624 @@
+Mostrar lista de tareas
+
+vamos a crear una lista de tareas que va a venir desde un archivo JSON.
+
+1. creamos un componente en /src/TaskList.jsx
+
+y creamos la funcion (rfce)
+
+import React from 'react'
+
+function TaskList() {
+  return (
+    <div>TaskList</div>
+  )
+}
+
+export default TaskList
+
+
+2. lo importamos desde App.jsx y utilizamos el componente TaskList.
+(con imp te completa para importar, 
+y con "tab" te mueves al otro lado
+
+tambien si escribes "import" y luego el nombre 
+a importar lo autocomplementa)
+
+import TaskList from "./TaskList"
+
+function HolaMundo() {
+  return ( 
+    <div>
+      <TaskList />
+    </div>
+  )
+}
+
+export default HolaMundo
+Nota: ahora con este TaskList voy a ver este texto dentro de es div.
+
+3. en main.jsx que es (index.js) archivo pricipal en donde pinta/renderiza los componentes, pintamos el componente App.jsx.
+porque devuelve lo que retorna el componente TaskList.jsx
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+
+
+** navegador
+consola: 
+➜  react-tasks-application npm run dev
+
+http://127.0.0.1:5173/
+TaskList
+
+--------------------------------------------------------------
+// ** en mi caso quiero mostrar una lista de tareas.
+(para eso necesito datos por eso creamos datos en nuestra propia applicacion)
+
+1. creamos un archivo /src/tasks.js
+(tambien puede ser un json)
+Aqui pueden ver la diferencia de cuando utilizar un archivo.jsx y cuando un archivo.js
+
+en este caso en "tasks.js" yo no voy a estar creando ninguna interfaz de jsx, por eso no es necesario llamarlo .jsx
+y lo unico que voy a estar creando en este archivo son datos en un formato de arreglo, es decir:
+
+creo un arreglo que va a tener un objeto con un id, title, descripcion.
+
+ya tengo 3 datos, ahora simplemente lo importamos,
+primero lo exportamos (no default)
+
+[tasks.js]
+
+export const tasks = [
+  {
+    id: 0,
+    title: "mi primer tarea",
+    description: "mi primer tarea",
+  },
+  {
+    id: 1,
+    title: "mi segunda tarea",
+    description: "mi segunda tarea",
+  },
+  {
+    id: 2,
+    title: "mi tercer tarea",
+    description: "mi tercer tarea",
+  },
+];
+
+lo importamos en: 
+
+[TaskList.jsx]
+
+y lo mostramos por consola.
+
+** navegador
+
+consola hay un arreglo con los 3 datos (objetos)
+ahora vamos a utilizar estos datos y mostrarlos en pantalla
+
+[
+Array(3)
+    0: {id: 0, title: 'mi primer tarea', description: 'mi primer tarea'}
+    1: {id: 1, title: 'mi segunda tarea', description: 'mi segunda tarea'}
+    2: {id: 2, title: 'mi tercer tarea', description: 'mi tercer tarea'}
+    length: 3
+    [[Prototype]]: Array(0)
+]
+
+--------------------------------------------------------------
+// **  ahora vamos a utilizar estos datos y mostrarlos en pantalla
+
+Para poder hacer eso, 
+tengo que guardarlo en un estado de react que es como una variable.
+
+1. Para eso tengo que importar 'react' y el useState que ya conocemos
+[import {useState} from 'react']
+
+2. para crear mas rapido es usando "useState" 
+y seleccionas useStateSnippet. (ctlr+space) 
+
+3. const [tasks, setTasks] = useState([]) 
+inicialmente el valor de tasks sera un arreglo vacio ([])
+es igual a esto: const tasks = []
+
+4. lo recorremos, de las tareas(tasks) utilizamos la funcion map y por cada task vamos a devolver un div sencillo,
+y dentro de este div, 
+escribimos un texto "tarea"
+
+5. si vamos a la pagina no aparecena,
+pero en consola aparecen el array con los 3 objetos
+y la razon de que no aparezcan nada, 
+porque inicialmente mis tareas (task), estado,
+no tienen nada, es un arreglo vacio.
+
+6. lo que puedo hacer es que antes que se retorne la lista de tareas
+puedo comprobar si estas tareas no tienen nada.
+
+
+[TaskList.jsx]
+
+import { tasks } from "./tasks";
+import { useState } from "react";
+
+console.log(tasks);
+
+function TaskList() {
+  const [tasks, setTasks] = useState([]);
+
+  return (
+    <div>
+      {tasks.map((task) => {
+        <div>tarea</div>;
+      })}
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+[tasks.js]
+
+export const tasks = [
+  {
+    id: 0,
+    title: "mi primer tarea",
+    description: "mi primer tarea",
+  },
+  {
+    id: 1,
+    title: "mi segunda tarea",
+    description: "mi segunda tarea",
+  },
+  {
+    id: 2,
+    title: "mi tercer tarea",
+    description: "mi tercer tarea",
+  },
+];
+
+--------------------------------------------------------------
+// ** lo que puedo hacer es que antes que se retorne la lista de tareas
+puedo comprobar si estas tareas no tienen nada.
+
+7. le digo si las tareas (tasks) ya es un arreglo [mi estado],
+le digo si el arreglo es igual a cero, 
+si no tiene ningun elemento,
+[ if (tasks.length === 0) ]
+
+y en lugar de retonar todo esto:
+
+return (
+    <div>
+      {tasks.map((task) => {
+        <div>tarea</div>;
+      })}
+    </div>
+  );
+
+va a retornar simplemente un h1 que diga:
+
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>
+  }
+
+
+
+[TaskList.jsx]
+
+import { tasks } from "./tasks";
+import { useState } from "react";
+
+console.log(tasks);
+
+function TaskList() {
+  const [tasks, setTasks] = useState([]);
+
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>
+  }
+
+  return (                  //arreglo del estado tasks (vacio) 
+    <div>                   // [no el array original tasks.js] 
+      {tasks.map((task) => {    
+        <div>tarea</div>;
+      })}
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+** navegador:
+en la pagina ya me muestra:
+No hay tareas aun   (la constante/estado task tiene el arreglo vacio)
+
+y en consola el array con los 3 objetos.
+
+--------------------------------------------------------------
+// ** ahora si le doy algunos valores al arreglo del estado tasks, voy a decirle toma el valor de (tasks) de las tareas que tenemos del arreglo original tasks.js
+
+[ const [tasks, setTasks] = useState(tasks); ]
+ahora ya no es un arreglo vacio ([]),
+ahora tiene los valores/datos del arreglo original tasks.js
+con las tareas.
+
+
+[TaskList.jsx]
+
+import { tasks } from "./tasks";
+import { useState } from "react";
+
+console.log(tasks);
+
+function TaskList() {
+  const [tasks, setTasks] = useState(tasks);
+
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => {
+        <div>tarea</div>;
+      })}
+    </div>
+  );
+}
+
+export default TaskList;
+
+** navegador
+no muestra nada en la pagina,
+pero en consola me aparece un errror.
+
+[   -- no puedo acceder a 'tasks' antes de la inicializacion
+
+    Uncaught ReferenceError: Cannot access 'tasks2' before initialization
+]
+
+Nota: el asunto es que cuando inicia la aplicacion,
+este "tasks" original [console.log(tasks);]
+aun no esta disponible para poder ser asignado en estas tareas,
+por consola podemos ver el arreglo con los 3 objetos,
+pero al momento que se esta creando este componente (el arreglo tasks original con los 3 objetos) aun no existe.
+
+-- Lo que tenemos que hacer es decirle, en lugar de utilizar este formato de tareas 
+(const [tasks, setTasks] = useState(tasks);)
+
+-- voy a decirle es un arreglo vacio ([])
+[ const [tasks, setTasks] = useState([]); ]
+pero cuando cargue el componente le voy a asignar estas tareas (el arreglo tasks original)
+
+-- Esa idea de cuando cargue el componente viene a partir del
+"useEffect", lo importamos 
+( import { useState, useEffect } from "react"; )
+
+-- le digo, 
+llama al useEffect y voy a ejecutar una funcion,
+y esta funcion le coloco un arreglo vacio ([]) 
+para decirle esto se va a ejecutar cuando cargue 
+el componente "TaskList".
+
+-- y cuando cargue lo unico que vas hacer es que vas a establecer
+en este arreglo de tareas (tasks del estado),
+este valor (tasks el arreglo original con los 3 objetos)
+le digo: setTasks y vas a establecer ese arreglo de tareas (arreglo original)
+
+const [tasks, setTasks] = useState([]);
+
+  useEffect(()=> {
+    setTasks(tasks)
+  })
+
+
+--------------------------------------------------------------
+// ** utilizando otro formato de tareas para que reconozca el areglo (tasks) original con los 3 objetos/datos. 
+Cuando cargue el componente
+
+import { tasks } from "./tasks";
+import { useState, useEffect } from "react";
+
+console.log(tasks);
+
+function TaskList() {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    setTasks(tasks);
+  });
+
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => {
+        <div>tarea</div>;
+      })}
+    </div>
+  );
+}
+
+export default TaskList;
+
+** navegador
+pagina: " No hay tareas aun"
+consola: Array(3)
+
+y ya no me da ningun error en consola.
+
+Pero no me esta mostrando nada, ningun dato,
+el arreglo de tareas (taks del estado que ahora tiene los valores del arreglo tasks original) lo esta reconociendo como vacio ([])
+
+-- y el asunto es como tienen el mismo nombre (tasks ambos),
+hay un conflicto y esto es un tema bastante comun en codigo,
+en cuanto nombrar las constantes.
+
+  useEffect(() => {
+    setTasks(tasks);
+  });
+
+lo que esta haciendo aqui es cuando carge el componente (TaskList) voy a establecer tareas [setTasks(tasks);],
+arreglo del estado vacio,
+
+y lo que le esta estableciendo es el mismo valor (tasks)
+es decir esto es como un arreglo vacio ([])
+[ const [[], setTasks] = useState([]); ] 
+
+y aqui le estoy diciendo establece ese arreglo vacio ([])
+( setTasks([]); )
+
+  useEffect(() => {
+    setTasks([]);
+  });
+
+-- y es por que este "task" original (import { tasks } from "./tasks";) 
+y la constante del estado "tasks" 
+( const [tasks, setTasks] = useState([]); )
+ambas se llaman igual,
+
+-- entonces puedo renombrarlo (tasks original),
+y hay un codigo que es como colocarle un "alias"
+[ import { tasks as data } from "./tasks"; ]
+ahora tiene (tasks el alias "data")
+
+-- y cuando cargue cargue el componente le vas
+a esteblecer este valor (data) que es lo que estoy trayendo de ese archivo.
+
+  useEffect(() => {
+    setTasks(data);
+  });
+
+
+
+--------------------------------------------------------------
+// ** ahora le ponemos una alias al (tasks original) como data para que ya no hay confusion con el mismo nombre ambos (tasks)
+
+
+import { tasks as data } from "./tasks";
+import { useState, useEffect } from "react";
+
+function TaskList() {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    setTasks(data);
+  });
+
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (   //[no {}] va () xq retorna un div
+        <div>tarea</div>
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+** navegador;
+pagina me muestra ahora 3 veces:
+tarea
+tarea
+tarea
+
+pero en consola muestra el error:
+
+[
+    Warning: Each child in a list should have a unique "key" prop.
+]
+
+--------------------------------------------------------------
+// ** ahora no quiero ver ese texto 3 veces en c/div.
+ahora quiero ver un h1 con el valor de la tarea (tasks del arreglo)
+
+** De la tarea que esta recorriendo quiero ver el titulo en un h1,
+
+y debajo coloco una etiqueta p quiero ver el task.description
+
+[TaskList.jsx]
+
+import { tasks as data } from "./tasks";
+import { useState, useEffect } from "react";
+
+function TaskList() {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    setTasks(data);
+  }, []);
+
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (
+        <div>
+          <h1>{task.title}</h1>
+          <p>{task.description}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+** navegador
+pagina:
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+en consola me sigue apareciendo ese error,
+porque ya sabemos que es un valor que se tiene 
+que anadir al elemento que esta recorriendo ()
+
+[
+    Warning: Each child in a list should have a unique "key" prop.
+]
+
+
+--------------------------------------------------------------
+// ** anadimos el unique "key" prop.
+el valor que se tiene que anadir al elemento que esta recorriendo.
+
+le coloco el valor del id de cada objeto (porque id es unico para cada objeto)
+[ <div key={task.id}> ]
+y ya con esto ya me da ningun error. 
+--------------------------------------------------------------
+    Codigo final
+
+[TaskList.jsx]
+
+import { tasks as data } from "./tasks";
+import { useState, useEffect } from "react";
+
+function TaskList() {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    setTasks(data); // asignamos a estado task el task original
+  }, []);
+
+  if (tasks.length === 0) {     // estado tasks
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (          // lo que se retorna va entre ()
+    <div>
+      {tasks.map((task) => (    // estado task tiene task original
+        <div key={task.id}>
+          <h1>{task.title}</h1>
+          <p>{task.description}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+** navegador:
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+y en consola ya no tengo errores.
+
+Con esto ya tenemos nuestro recorrido de la lista de tareas,
+si se dan cuenta es aqui tengo un componente "TaskList"
+y si voy al componente "App" este ya lo esta importando,
+ya tiene toda esa logica de las tareas.
+
+entonces este componente "TaskList" ya contiene la lista de tareas y esta mostrandolo en pantalla.
+
+
+[tasks.js]
+
+export const tasks = [
+  {
+    id: 0,
+    title: "mi primer tarea",
+    description: "mi primer tarea",
+  },
+  {
+    id: 1,
+    title: "mi segunda tarea",
+    description: "mi segunda tarea",
+  },
+  {
+    id: 2,
+    title: "mi tercer tarea",
+    description: "mi tercer tarea",
+  },
+];
+
+
+[App.jsx]
+
+import TaskList from "./TaskList"
+
+function HolaMundo() {
+  return ( 
+    <div>
+      <TaskList />
+    </div>
+  )
+}
+
+export default HolaMundo
+
+
+[main.jsx]
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+
+
+
+--------------------------------------------------------------

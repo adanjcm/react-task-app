@@ -1,0 +1,644 @@
+Eliminar Tarea
+
+para Eliminar una Tarea vamos a crear un boton dentro de cada un de estas Tareas (task cards),
+y creamos una funcion para el boton, que se replicara para componente creado,
+
+y para ejecutar la fn, 
+cuando el boton de un click va a ejecutar la fn mostrarAlerta
+
+// ** fn que muestra alerta cuando cuando le damos click al boton Eliminar.
+
+[TaskCard]
+
+function TaskCard({ task }) {
+  // recibe los objetos de funcion map del array tasks
+
+  function mostrarAlerta() {
+    alert("Eliminando ...");
+  }
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={mostrarAlerta}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+** navegador
+
+mi primer tarea
+mi primer tarea
+Eliminar tarea  (boton) --> le doy click sale alerta 
+                            (Eliminando ...) en c/tarjeta y boton 
+
+mi segunda tarea
+mi segunda tarea
+Eliminar tarea
+
+mi tercer tarea
+mi tercer tarea
+Eliminar tarea
+
+Escribe tu tarea (input)
+Escribe la descripcion  de la tarea (textarea)
+Guardar (boton)
+
+// ** recuedan que c/tarea tenia un (id) ahora quiero identificar ese (id de la tarjeta) para quitarlo del arreglo.
+
+ahora le digo cuando de un click al boton (mostrarAlerta), lo que vamos hacer es capturar el id de ese momento.
+
+como la funcion mostrarAlerta es javascript puede guardar los valores que esta recibiendo,
+asi que le digo cuando le de un click en mostrarAlerta,
+yo quiero que me muestres en lugar de este texto (Eliminando ...), 
+
+el task.id [porque en task tenemos id, title, description]
+
+function TaskCard({ task }) {
+  // recibe los objetos de funcion map del array tasks
+
+  function mostrarAlerta() {
+    alert(task.id);
+  }
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={mostrarAlerta}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+** navegador
+
+ahora cuando le doy click al boton Eliminar tarea
+me muestra el alert con (id de la tarjeta [task])
+en la primero 0, segunda 1, tercera 2.
+
+
+// ** no es necesario que me diga el orden de la secuencia xq cada una de estas tarjetas tiene un (id)
+entonces, lo importante es que ya me esta dando el valor para poder quitarlas (id), 
+
+lo que voy hacer aqui en la funcion en lugar de mostrarme el (id) vamos utilizarlo para eliminar.
+
+** lo que tenemos que hacer para eliminar un dato,
+vamos al componente "App", es quitar un elemento del arreglo (task),
+[ const [tasks, setTasks] = useState([]); // nuevo array tasks vacio ]
+
+y para poder poder entenderlo mejor vamos a la consola del navegador. veamos un ejemplo mas sencillo.
+
+supongamos que tengo un arreglo numbers tiene 3 valores (10, 99, 20),
+ahora supongamos que quiero quitar el valor 99, 
+tengo varias formas de hacerlo, 
+la forma mas sencilla seria, quiero eliminar este elemento en el indice 2 (1).
+
+-- Pero lo que me dice react es que para eliminar un dato de un arreglo yo tengo que generar un nuevo arreglo 
+pero simplemente con este elemento.
+
+-- la forma de eliminar seria de esta forma del arreglo numbers vamos a filtrar (filter es una funcion de javascript que permite recorrer todos los arreglos uno por uno y aplicar una condicion).
+
+-- le digo por cada recorrido (n representa c/u de estos elementos del arreglo)  
+y por c/recorrido le digo si n es distinto de 99 (n!== 99)
+
+recorre c/elemento del arreglo si se cumple la respuesta es "true", y se queda el elemento en el arreglo,
+y como 99 no es distinto de 99 esto da "false", 
+entonces no se anade al arreglo y sigue con 20, y como es distinto es "true" y se anade,
+
+al final queda con los elementos que fueron "true"
+en esta condicion (n!==99),
+
+** esta es una forma de eliminar porque he quitado a 99
+
+Nota: hay que guardarlo en nuevo arreglo,
+porque no altera al arreglo original.
+
+
+[
+const numbers = [10, 99, 20]
+undefined
+numbers
+(3) [10, 99, 20]
+numbers.filter(n => n !==  99 )
+(2) [10, 20]
+numbers
+(3) [10, 99, 20]
+const numbersFiltrado = numbers.filter(n => n !==  99 )
+undefined
+numbersFiltrado
+(2) [10, 20]
+]
+
+
+** De esta misma manera puedo quitar un objeto del arreglo utilizando el metodo filter.
+
+en [App] creamos una funcion que va a quitar ese elemento,
+ahora tenemos el mismo asunto que cuando creamos el "createTask (la funcion)"
+
+-- vamos de nuevo con nuestro grafico,
+recuerdan que el "App" tenia el arreglo de las tareas (tasks) y "App" tambien tiene una funcion "createTask" 
+tambien, ahora vamos a crear una funcion "deleteTask"
+y esta va hacer quitar un elemento del arreglo,
+
+si ejecutamos deleteTask() lo que va a devolver es un arreglo pero sin alguno de estos elementos
+y como el "App" esta sienco leido por el "TaskList" el va a ver reflejado el cambio nada mas. 
+
+-- lo unico que tengo que hacer es crear una funcion en "App" y pasarse a quien lo va a utilizar,
+en este caso lo va a utilizar el "TaskList"
+
+De hecho el "TaskList" no lo va a utilizar xq si vemos el codigo y el que tiene el boton (Eliminar) es el "TaskCard" y es que el grafico ha cambiado.
+
+dentro del "TaskList" tengo 3 componentes "TaskCard",
+la funcion "deleteTask" se la va a pasar a "TaskList" 
+y "TaskList" va a pasarsela a "TaskCard" de tal forma que esta tarjeta/componente va a ejecutar la funcion (deleteTask) y luego cuando se ejecute nuevamente se la va a pasar a "TaskList" y luego a "App".
+
+entonces de esta forma cuando se ejecute va a poder a poder interactuar con este arreglo (tasks)
+
+si quieren ver esta grafico van consolo componentes de react, pueden ver la estructura, App-TaskForm-TaskList-multiples TaskCard
+
+// ** Entonces me voy a crear la funcion "deleteTask"
+y esta funcion lo que va hacer por ahora es mostrarme cuantas
+tareas tengo (arreglo de las tareas)
+
+y voy a decirle quien lo va ajecutar,
+voy a decirle, este "deleteTask" se lo voy a pasar a "TaskList" porque el es que lo va a utilizar,
+entonces le digo te voy a pasar una "propiedad llamada 'deleteTask'
+y como valo va ser el "deleteTask la funcion" 
+
+[App]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+import { tasks as data } from "./data/tasks";
+import { useState, useEffect } from "react";
+
+function App() {
+  const [tasks, setTasks] = useState([]); // nuevo array tasks vacio
+
+  useEffect(() => {
+    setTasks(data);           // se llena el array con los datos del array original
+  }, []);                     // solo se ejecuta una vez c/carga el componente
+
+  function createTask(task) { // recibe objeto c/propiedades 
+    setTasks([                // las agrega al array de objetos 
+      ...tasks,               // existente en un nuevo objeto
+      {
+        title: task.title,
+        id: tasks.length,
+        description: task.description,
+      },
+    ]);
+  }
+
+  function deletTask(params) {
+    console.log(task);
+    
+  }
+
+  return (
+    <div>
+      <TaskList tasks={tasks} deletTask={deletTask} />              {/* se envia arreglo tasks */}
+      <TaskForm createTask={createTask} />    {/* se envia funcion */}
+    </div>
+  );
+}
+
+export default App;
+
+// ** ahora si vengo a "TaskList" le digo estas recibiendo una "propiedad 'deleteTask' que es una funcion pero aqui no tengo ninguna interfaz para utilizarla,
+[ function TaskList({ tasks, deleteTask }) {...} ]
+
+asi que tambien se la paso al "TaskCard",
+te voy a pasar una funcion 'deleteTask' y como valor tambien sera el "deletTask" que me estan pasando aqui 
+[ function TaskList({ tasks, deleteTask }) {...} ]
+
+incluso le puedo pasar otro nombre
+[ <TaskCard key={task.id} task={task} eliminarTarea={deleteTask} /> ] 
+y tambien lo cambiaria en 
+[ function TaskList({ tasks, deleteTask }) {...} ]
+
+-- pero es recomendable colocarle un nombre similar a la funcion, 
+entonces queda asi:
+[ <TaskCard key={task.id} task={task} deleteTask={deleteTask} /> ]
+
+---------------------------------------------------------
+[TaskList]
+
+import TaskCard from "./TaskCard";
+
+function TaskList({ tasks, deleteTask }) {
+  // recibe el array de objetos tasks
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} deleteTask={deleteTask} /> // key c/elemento y envio objetos
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+---------------------------------------------------------
+// ** ahora me voy a [TaskCard]
+
+y en "TaskCard" le digo voy a recibir una funcion 'deleteTask'
+[ function TaskCard({ task, deleteTask }) ]
+
+lo que voy hacer es que cuando se de un click en el boton (Eliminar Tarea)
+no voy no voy a mostrar esta funcion "mostrarAlerta" (la eliminamos).
+[
+  function mostrarAlerta() {
+    alert(task.id);
+  }
+]
+
+sino le voy a decir al boton que va estar ejecutando "deletTask"
+[ <button onClick={deleteTask}>Eliminar tarea</button> ]
+
+-- Ahora yo no lo puedo ejecutar asi porque le estoy diciendo 
+que cuando se de un click va a recibir informacion del evento (e) onClick,
+pero por ahora lo dejamos asi, y al rato lo modificamos.
+
+lo unico que hace el onClick es ejecutar la funcion "deleteTask" 
+---------------------------------------------------------
+[TaskCard]
+
+function TaskCard({ task, deleteTask }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={deleteTask}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+** navegador
+
+si voy a consola y le doy click en el boton (Eliminar Tarea)
+vemos que me devuelve el arreglo de las tareas (tasks),
+en cualquier boton me devuelve el arreglo.
+
+[
+(3) [{…}, {…}, {…}]
+    0: {id: 0, title: 'mi primer tarea', description: 'mi primer tarea'}
+    1: {id: 1, title: 'mi segunda tarea', description: 'mi segunda tarea'}
+    2: {id: 2, title: 'mi tercer tarea', description: 'mi tercer tarea'}
+    length: 3
+    [[Prototype]]: Array(0)    
+]
+
+** Esto quiere decir que c/vez que don un click,
+este boton onClick esta accediendo al arreglo de tareas (deleteTask),
+esto es muy util porque apartir de aqui puedo eliminar,
+[ <button onClick={deleteTask}>Eliminar tarea</button> ]
+
+Entonces puedo decirle cuando te ejecutes te voy a pasar un parametro
+
+[ ]
+
+---------------------------------------------------------
+// ** Ahora yo necesito pasarle a este "deleteTask" en [App]
+necesito pasarle un id de la tarea (taskId)
+y tambien voy a verlo.
+
+[
+  function deleteTask(taskId) {
+    console.log(tasks);
+    console.log(taskId);
+  }
+]
+
+** me voy [TaskCard]
+y cuando se ejecute el boton (Eliminar Tarea) vas a ejecutar la funcion 'deleteTask' y te puedo pasar un argumento, 10 por ejemplo.
+[ <button onClick={deleteTask(10)}>Eliminar tarea</button> ]
+
+nota: yo no lo puedo hacer asi porque lo que va a pasar es que se va ejecutar cada vez que cargue la aplicacion, 
+si yo guardo estoy y refresco la pagina. 
+Ya se esta ejecutando todas las funciones (6 veces)
+
+** Porque esto hace basicamente este codigo (TaskCard)
+aqui esta creando una funcion, va a crear un h1, una etiqueta p,
+y cuando llega al boton, si yo lo estoy escribiendo asi,
+le estoy diciendo ejecuta esta funcion y se empieza a ejecutar 
+[ <button onClick={deleteTask(10)}>Eliminar tarea</button> ]
+
+en consola me aparece 6 veces, en lugar de solo una.
+
+[
+(3) [{…}, {…}, {…}]
+    0: {id: 0, title: 'mi primer tarea', description: 'mi primer tarea'}
+    1: {id: 1, title: 'mi segunda tarea', description: 'mi segunda tarea'}
+    2: {id: 2, title: 'mi tercer tarea', description: 'mi tercer tarea'}
+    length: 3
+    [[Prototype]]: Array(0)    
+(3) [{…}, {…}, {…}]
+    0: {id: 0, title: 'mi primer tarea', description: 'mi primer tarea'}
+    1: {id: 1, title: 'mi segunda tarea', description: 'mi segunda tarea'}
+    2: {id: 2, title: 'mi tercer tarea', description: 'mi tercer tarea'}
+    length: 3
+    [[Prototype]]: Array(0)    
+(3) [{…}, {…}, {…}]
+    0: {id: 0, title: 'mi primer tarea', description: 'mi primer tarea'}
+    1: {id: 1, title: 'mi segunda tarea', description: 'mi segunda tarea'}
+    2: {id: 2, title: 'mi tercer tarea', description: 'mi tercer tarea'}
+    length: 3
+    [[Prototype]]: Array(0)    
+(3) [{…}, {…}, {…}]
+    0: {id: 0, title: 'mi primer tarea', description: 'mi primer tarea'}
+    1: {id: 1, title: 'mi segunda tarea', description: 'mi segunda tarea'}
+    2: {id: 2, title: 'mi tercer tarea', description: 'mi tercer tarea'}
+    length: 3
+    [[Prototype]]: Array(0)    
+(3) [{…}, {…}, {…}]
+    0: {id: 0, title: 'mi primer tarea', description: 'mi primer tarea'}
+    1: {id: 1, title: 'mi segunda tarea', description: 'mi segunda tarea'}
+    2: {id: 2, title: 'mi tercer tarea', description: 'mi tercer tarea'}
+    length: 3
+    [[Prototype]]: Array(0)    
+(3) [{…}, {…}, {…}]
+    0: {id: 0, title: 'mi primer tarea', description: 'mi primer tarea'}
+    1: {id: 1, title: 'mi segunda tarea', description: 'mi segunda tarea'}
+    2: {id: 2, title: 'mi tercer tarea', description: 'mi tercer tarea'}
+    length: 3
+    [[Prototype]]: Array(0)    
+]
+
+[ <button onClick={deleteTask(10)}>Eliminar tarea</button> ]
+
+// ** Entonces para para decirle que quiero solo el evento onClick
+tengo que quitarle estos parantesis [()] **
+[ <button onClick={deleteTask}>Eliminar tarea</button> ]
+
+Es como decirle recien se ejecute este onClick se va a ejecutar 
+esta funcion.
+
+Entonces si yo quito los parentesis 
+[ <button onClick={deleteTask}>Eliminar tarea</button> ]
+lo volvemos a lo anterior
+en la pagina.
+
+y en consola me aparece el arreglo cada vez que le doy un click 
+al boton, ya no aparecen los 6 arreglos de golpe, sino uno con cada click.
+
+[
+(3) [{…}, {…}, {…}]     --> arreglo tasks
+    0: {id: 0, title: 'mi primer tarea', description: 'mi primer tarea'}
+    1: {id: 1, title: 'mi segunda tarea', description: 'mi segunda tarea'}
+    2: {id: 2, title: 'mi tercer tarea', description: 'mi tercer tarea'}
+    length: 3
+    [[Prototype]]: Array(0)    
+
+    SyntheticBaseEvent {_reactName: 'onClick', _targetInst: null, type: 'click', nativeEvent: PointerEvent, target: button, …} --> objeto 'event'
+]
+
+-- y el valor que esta reciendo el "deleteTask" como parametro 
+es como si le estuviera pasando event (e)
+[ <button onClick={deleteTask(e)}> ] --
+
+y es por eso que cuando doy un click en el boton,
+ademas del arreglo veo este objeto 'event'.
+
+---------------------------------------------------------
+// ** ahora yo no quiero todo el objeto 'event'
+y para solucionarlo voy a decirle que a ejecutar una funcion 
+anonima y esta funcion anonima va a ejecutar el "deleteTask" (funcion)
+y adentro le voy a pasar el valor que quiero,
+en este caso le paso el id de la tarea (task.id)
+que es lo que quiero.
+
+[ <button onClick={() => deleteTask(task.id)}>Eliminar tarea</ ]
+
+Entonces esta es otra forma de decir esta funcion tan solo se va a ejecutar si se va dar un click en boton (Eliminar Tarea)
+una vez que se un click recien vas a ejecutar esta otra funcion 
+( deleteTask(task.id) )
+
+
+
+[TaskCard]
+
+function TaskCard({ task, deleteTask }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+
+** navegador 
+
+si le doy click en cualquier boton me devuelve la lista de tareas (arreglo tasks) y el valor del id de la tarjeta/componente.
+
+en consola:
+[
+(3) [{…}, {…}, {…}]
+0
+(3) [{…}, {…}, {…}]
+1
+(3) [{…}, {…}, {…}]
+2
+]
+
+** Entonces me esta devolviendo los valores a medida que le estoy dando un click al boton.
+
+---------------------------------------------------------
+// ** ahora con esos 2 valores (arreglo e id) puedo venir 
+en [App] ya puedo hacer ese filtro para quitarlo,
+entonces le digo,
+
+de tasks vamos a utilizar un filter y por cada tarea que recorras (task) voy a comparar si la tarea en su propiedad id (task.id) es distinto del task.id que estan pasando (task.id !== taskId)
+
+[
+  function deleteTask(taskId) {
+    tasks.filter((task) => task.id !== taskId);
+  }
+]
+
+nota; esta sintaxis puede confundir a mucho pero de nuevo es muy similar a lo que hicimos en consola, simplemente le digo por cada tarea que estas recorriendo confirma si id (task.id) es diferente al id que te estan pasando (taskId)
+
+recuerden que el arreglo lo tenemos en /src/data/tasks.js
+
+supongamos que le doy un click al boton (eliminar Tarea)
+y si me devuelve un id=1, entonces empieza a recorrer el arreglo (/src/data/tasks.js) y dice el primer id=0, es igual a 1 "false",
+
+pero como tengo que es diferente, id=0 !== 1 entonces da "true"
+y se queda, 
+
+el segundo id:1 !== 1 esto es "false" este se quitado
+
+el tercero id:2 !== 1 esto es "true" este se queda
+
+de esta forma quitamos el elemento que es distinto de 1 (id:1)
+porque es "false" 
+
+es por eso que esta sintaxis se queda asi.
+
+el (id) que reciba la funcion "deleteTask" se va a ir comparando.
+
+** esto me va a devolver un nuevo arreglo, pero ese nuevo arreglo
+ya no tiene ese elemento que he quitado.
+
+[
+  function deleteTask(taskId) {
+    tasks.filter((task) => task.id !== taskId);
+  }
+]
+
+** entonces es lo que voy a establecer en el estado (setTasks)
+le digo setTasks(voy a establecer este nuevo arreglo)
+
+[
+  function deleteTask(taskId) {
+    setTasks(tasks.filter((task) => task.id !== taskId));
+  }
+]
+
+si yo guardo con esto ya estamos eliminando.
+
+** navegador
+si doy click en el boton (eliminarTarea) se elimina esa tarea.
+asi con todas y final solo queda:
+
+No hay tareas aun
+
+Escribe tu tarea (input) Escribe la descripcion de la tarea (textarea)
+Guardar (boton)
+
+y en consola no muestra nada.
+
+** puedo crear nuevas Tareas, ... Guardar (boton)
+se van creando tareas;
+
+1
+1
+Eliminar tarea
+
+2
+2
+Eliminar tarea
+
+Escribe tu tarea (input) Escribe la descripcion de la tarea (textarea)
+Guardar (boton)
+
+y de la misma manera si le doy click al boton (eliminarTarea)
+se van eliminando las tareas de la interfaz.
+
+** listo con esto ya tenemos finalmente nuestro boton de eliminar, luego continuaremos mejorando la interfaz.
+
+[ original
+  function deleteTask(taskId) {
+    console.log(tasks);
+    console.log(taskId);
+  }
+]
+
+---------------------------------------------------------
+codigo final
+
+[TaskCard]
+
+function TaskCard({ task, deleteTask }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+
+[TaskList]
+
+import TaskCard from "./TaskCard";
+
+function TaskList({ tasks, deleteTask }) {
+  // recibe el array de objetos tasks
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} deleteTask={deleteTask} /> // key c/elemento y envio objetos
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+[App]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+import { tasks as data } from "./data/tasks";
+import { useState, useEffect } from "react";
+
+function App() {
+  const [tasks, setTasks] = useState([]); // nuevo array tasks vacio
+
+  useEffect(() => {
+    setTasks(data); // se llena el array con los datos del array original
+  }, []); // solo se ejecuta una vez c/carga el componente
+
+  function createTask(task) {
+    // recibe objeto c/propiedades
+    setTasks([
+      // las agrega al array de objetos
+      ...tasks, // existente en un nuevo objeto
+      {
+        title: task.title,
+        id: tasks.length,
+        description: task.description,
+      },
+    ]);
+  }
+
+  function deleteTask(taskId) {
+    setTasks(tasks.filter((task) => task.id !== taskId)); // true se queda
+  }
+
+  return (
+    <div>
+      <TaskList tasks={tasks} deleteTask={deleteTask} />{" "}
+      {/* se envia arreglo tasks */}
+      <TaskForm createTask={createTask} /> {/* se envia funcion */}
+    </div>
+  );
+}
+
+export default App;
+
+---------------------------------------------------------
+
+
+
+

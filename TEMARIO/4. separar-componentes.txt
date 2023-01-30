@@ -1,0 +1,633 @@
+Separar componentes
+
+vamos a Separar los componentes en otros subcomponentes,
+por lo general cuando creamos una aplicacion,
+separamos en componentes como estos (TaskForm, TaskList)
+pero este TaskList esta conformado por otras porciones 
+de interfaces asi que lo que podemos es crear otros componentes
+que reutilicen esta parte.
+
+// ** cortamos el <div> del map de TaskList
+y voy a moverlo hacia un nuevo componente que voy a llamar 
+"src/TaskCard.jsx"
+
+        <div key={task.id}>
+          <h1>{task.title}</h1>
+          <p>{task.description}</p>
+        </div>
+
+
+// ** creo subcomponente "TaskCard.jsx"
+
+Creamos un componente basico "TaskCard"
+y pegamos lo de la seccion anterior
+
+function TaskCard() {
+  return (
+    <div key={task.id}>   // se elimina el key
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+* Con esto lo unico que necesito es reutilizar esta porcion del <div>, para poder hacerlo tengo que importar esta "TaskCard",
+pero debemos quitar este key (key={task.id}),
+
+porque no vamos a utilizar aqui (en este componente TaskCard),
+sino cuando utilicemos este (TaskCard) [cuando pongamos este componente en "TaskList"]
+
+function TaskCard() {
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+
+// ** agregando/importando este componente en [TaskList]
+
+Aqui llamamos el componente "TaskCard".
+
+Voy a importar TaskCard.
+
+Ahora ese componente "TaskCard" necesita de una tarea que tenga un title y un description,
+
+entonces vamos al "TaskList" y le digo voy a pasare un (prop),
+que se a llamar task y el valor va hacer la tarea (task) que se esta recorriendo en ese momento (<TaskCard task={task} />),
+ahora de esta forma cada vez que se recorra este arreglo (tasks.map) va a generar a generar un componente (<TaskCard task={task} />), y le va a pasar una tarea (task)
+
+import TaskCard from "./TaskCard";
+
+function TaskList({ tasks }) {
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (
+        <TaskCard task={task} />
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+
+// ** ahora si voy a [TaskCard], este componente esta recibiendo un (prop), entonces le digo desde (props.task - objeto completo-) quiero extraer "task", puedo estructarlo y entoces como ya tengo la tarea (task)
+ya puedo acceder al title y al description.
+
+function TaskCard({ task }) {
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+
+** si guardo y formateo y voy a la aplicacion/pagina
+vemos que es lo mismo.
+De hecho si creo una nueva tarea sigue funcionando igual, la crea.
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+cuarta tarea
+nueva tarea
+
+Escribe tu tarea Guardar
+
+** pero en consola me marca un warnig.
+que 
+
+[
+Warning: Each child in a list should have a unique "key" prop.    
+]
+
+
+// ** vamos a arreglar el texto de description que siempre es el mismo. 
+
+nos vamos a [TaskForm] y una forma de poder colocar tambien una description anadir otro <input>, como una description puede ser mas grande,
+vamos a anadir un <textarea>
+
+* Y ya vemos el textarea en nuestra aplicacion.
+
+** ahora me voy a la seccion donde este el useState de "title"
+[ const [title, setTitle] = useState(""); ]
+
+y puedo  copiarlo y le digo que tambien quiero crear un useState
+llamado "description" y su funcion setDescription y como valor inicial sera un string vacio ("")
+[ const [description, setDescription] = useState(""); ]
+
+ahora para poder asignar este valor (setDescription),
+le digo, cuando se ejecute el evento onChange (textarea) similar al del <input>, recibo un objeto (e) y voy a establecer un setDescription y le establesco el valor (e.target.value)
+
+De esta forma es exactamente igual si se dan cuenta al input,
+solo lo que cambia que lo esta llenando dentro de "description",
+lo estoy llenando.
+
+*** lo que voy hacer cuando cree una tarea (createTask),
+ya no tan solo le voy a pasar el "title" [createTask(title); dentro de la funcion "handleSubmit"], sino tambien le voy a pasar este "description". 
+
+Por ahora vamos a verlo por consola.
+
+[TaskForm]
+
+import { useState } from "react";
+
+function TaskForm({ createTask }) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(title, description);
+    createTask(title);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+      />
+      <textarea
+        placeholder="Escribe la descripcion de la tarea"
+        onChange={(e) => {
+          setDescription(e.target.value);
+        }}
+      ></textarea>
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+** navegador 
+pongo una nueva tarea en el <input> y una descripcion en <textarea> y le doy click en Guardar
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+tarea nueva
+nueva tarea
+
+tarea nueva
+tarea descripcion
+Guardar
+
+y vamos a la consola me aparece:
+
+[
+tarea nueva tarea descripcion    
+]
+
+** ya estoy capturando los valores de "title" y "descripcion"
+pero aun no se lo estoy pasando a createTask()
+
+// ** vamos a mejorar el createTask en [App]
+
+el createTask tan solo espera un string (function createTask(taskTitle))
+lo que voy a decirle que va esperar de nuevo una tarea,
+y esta tarea (task) y este "task" va estar conformada por 2 propiedades (un title, y una description)
+
+// ** Regreso a [TaskForm] 
+
+[createTask(title);] --> actulmente
+
+y le digo cuando "createTask" se ejecute voy a pasar un objeto con un "title",
+"description".  Ahora ya le estoy pasando un objeto nuevo.
+
+[
+    createTask({ title, description });
+]
+
+// ** Entonces al recibir [App] 
+
+createTask(task) ya es un objeto y ya no [createTask(taskTitle) ya no es un string]
+
+entonces como recibo un objeto [createTask(task)],
+ya puedo utilizar sus propiedades 
+
+[ App 
+
+import TaskForm from "./TaskForm";
+import TaskList from "./TaskList";
+import { tasks as data } from "./tasks";
+import { useState, useEffect } from "react";
+
+function App() {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    setTasks(data);
+  }, []);
+
+  function createTask(task) {
+    setTasks([
+      ...tasks,
+      {
+        title: task.title,
+        id: tasks.length,
+        description: task.description,
+      },
+    ]);
+  }
+
+  return (
+    <div>
+      <TaskList tasks={tasks} />
+      <TaskForm createTask={createTask} />
+    </div>
+  );
+}
+
+export default App;
+
+]
+
+** navegador
+si escribo
+mi nueva tarea (input)
+con una descripcion (textarea)
+ahora ya agrega la descripcion que he hecho y no se repite
+
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+mi nueva tarea
+con una descripcion
+
+mi nueva tarea (input) con una descripcion (textarea) Guardar (boton)
+
+** y tan solo nos falta un asunto porque cuando recorremos la lista de elementos
+en consola marca el error (cada elemento hijo deberia tener una clave unica)
+
+[
+warnig: each child in a list should have a unique "key" prop 
+]
+
+// ** voy a [TaskList] para poner clave unica.
+
+cada vez que se genere este "TaskCard" tambien va a tener un key 
+[ <TaskCard key={task.id} task={task} /> ]
+
+ahora si voy al navegador:
+ya no me da error en consola 
+
+y si creo algo nuevo y le doy guardar, esto se anade.
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+cuarta tarea
+cuarta descripcion
+
+cuarta tarea    cuarta descripcion  Guardar
+
+
+*** Entonces con esto lo que hemos hecho es:
+    separar "TaskCard" en un componente,
+    hemos mejorado el "TaskForm" 
+    y de esta forma estamos haciendo la misma funcionalidad
+    pero un poco mejor en la organizacion de componentes
+
+
+Algo mas vamos a ordenar nuestros archivos en la carpeta src,
+porque en la estructura, porque se estan combinando los archivos 
+"main", "App", "TaskCard", ... 
+y en un proyecto mas grande se puede incrementar en archivos,
+
+entonces creamos un carpeta (src/components) y esta carpeta por lo general 
+contiene componentes, entonces coloco los componetes ahi,
+pero si los muevo recuerden que el componente "App" esta importando estos componentes (TaskList, TaskForm, task)
+
+lo que puedo hacer es vscode trabaja muy bien con javascript,
+si yo muevo un "TaskCard" dentro de la carpeta 'components' 
+y si le doy en "move" lo mueve y me pregunto si quiero hacer el refactor, le doy en "yes" 
+y en este caso en "TaskList" si cambia el valor.
+(import TaskCard from "./TaskCard"; queda asi porque esta en la misma carpeta components)
+tambien muevo a esa carpeta components "TaskList".
+y automaticamente cambio la ruta en "App",
+tambien movemos "TaskForm" y tambien lo a actulizado
+[ App.jsx
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";  
+]
+
+-- carpeta src/components: TaskCard, TaskForm, TaskList. --
+
+y ya esta, de esta forma es como se organiza 
+en un aplicacion colocamos el "App" y le "main.jsx" afuera de nuestro de la carpeta components y los multiples elementos hijos de van dentro del App van en una carpeta "components"
+
+y de hecho dentro "components" puedo crear dentro un carpeta llamada "tasks" y luego otra carpeta "users"
+"auth", yo que yo requiera realmente para mi aplicacion.
+
+** De hecho una cosa mas en la que podemos ordenar dentro de "src" puedo crear una carpeta "data" y esta va a contener las tareas (tasks.js)]
+
+y ahora en "App.jsx" lo esta importando
+[ import { tasks as data } from "./data/tasks"; ]
+
+// ** ahora vamos a limpiar el <textarea> e <input> despues de dar click en Guardar.
+
+nos vamos a [./components/TaskForm]
+
+y le digo una vez crees la tarea (task), 
+luego vamos a estables estos valores (<textarea> e <input>) a vacio.
+
+Lo que puedo hacer es que cuando <input> ya lleno los datos y le demos click al boton Guardar,
+es decir en el "onSubmit" (la funcion handleSubmit),
+despues de que cree, vamos a tratar de limpiar los valores. 
+
+para hacerlo,
+asi como estamos llenando los valores de "title" y "description", 
+tambien puedo decirle establece setTitle y setDescription en vacio ("")
+
+[
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createTask({ title, description });
+    setTitle("");
+    setDescription("");
+  };
+
+]
+
+** ahora voy al navegador
+
+y me voy a componets de la consola y me voy a "TaskForm" 
+
+[ vemos los hooks (estados de)
+hooks
+
+1State:""   --> title
+2State: ""  --> description
+] 
+
+ahora si escribo en el input: mi cuarta tarea 
+podemos ver que se actuliza el 
+estado/hook 1State: "mi cuarta tarea"
+
+y textarea: la descripcion de la cuarta tarea
+estado/hook 2State: "la descripcion de la cuarta tarea"
+
+tambien se actuliza.
+
+luego le doy click en el boton Guardar,
+se anade, 
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+mi cuarta tarea
+la descripcion de la cuarta tarea
+
+mi cuarta tarea (input) la descripcion de la cuarta (textarea) tarea Guardar (boton)
+
+pero en los hooks/estados, se resetea a vacio ("")
+quiere decir que ya se actualizo el valor,
+
+hook 1State: ""
+hook 2State: ""
+
+pero pueden ver que tanto el <input> como el <textarea> no me esta reflejando lo que tiene el estado ("")
+
+El estado est vacio (""), pero el <input>, <textarea> todavia se quedo con el valor
+
+// ** [TaskForm] lo que le voy a decir al <input>, que represente un valor igual a lo tiene el estado ( value={title} ),
+
+y lo mismo para <textarea> (value={description})
+que son justamente el valor que tiene los estados.
+
+Nota: estoy no va a interferir con lo que hemos hecho,
+porque a medida que voy cambiando este titulo (title) voy llenado (setDescription(e.target.value);) ese titulo,
+
+y esto se ve reflejando en lo que voy llenando tambien (value={description})
+
+** si regreso al navegador
+
+input: mi tarea nueva
+textarea: esta es una tarea nueva
+
+podemos ver que se estan llenando los valores
+en los hooks/estados [componente TaskForm]
+
+hook 
+  1State: "mi tarea nueva" (input title)
+  2State: "esta es una tarea nueva" (textarea)
+
+y si le doy click al boton Guardar,
+se anade, 
+
+
+mi primer tarea
+mi primer tarea
+
+mi segunda tarea
+mi segunda tarea
+
+mi tercer tarea
+mi tercer tarea
+
+mi tarea nueva
+esta es una tarea nueva
+
+Escribe tu tarea (input) Escribe la descripcion de la tarea (textarea) Guardar (boton)
+
+y vuelve los estados/hooks a su valor inicial 
+(vacio "") y tambien se reflejan en los inputs, textarea, estan vacios
+
+hook 
+  1State: ""
+  2State: ""
+
+
+** entoces de esta forma ya tambien estoy limpiando el formulario.
+
+y ya puedo anadir algo, le doy en Guardar, se limpian y apartir de aqui puedo empezar a continuar con esto.
+(nota: no altera el anadir los valores durante el proceso)
+
+** una cosa mas,
+nuesto <input> yo quisiera cada vez que cargue la aplicacion apara apareca el "focus" aqui (que ya este el cursor paradeando)
+
+vengo al <imput> y le digo vas anadir una propiedad llamada "autoFocus"
+
+[
+<input
+  placeholder="Escribe tu tarea"
+  onChange={(e) => {
+    setTitle(e.target.value);
+  }}
+  value={title} autoFocus
+/>  
+]
+
+** Y en el navegador ya aparace el cursor parpadeando 
+(autoFocus)
+
+puedo anadir y sigue funcionando de la misma manera.
+
+* De esta forma ya he podido crear tareas de forma rapida, y ya estamos mejorando un poco la interfaz,
+en la siguiente seccion vamos a aprender eliminar tareas porque en este momento estamos creando y no estamos teniendo la posibilidad de quitarlas.
+----------------------------------------------------------------------------
+Codigo final
+
+[TaskForm]
+
+import { useState } from "react";
+
+function TaskForm({ createTask }) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createTask({ title, description }); // enviamos objeto con estas propiedades
+    setTitle("");                       // resetea a vacio los inputs despues de 
+    setDescription("");                 // enviar los valores de la fn createTask
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+        value={title} autoFocus
+      />
+      <textarea
+        placeholder="Escribe la descripcion de la tarea"
+        onChange={(e) => {
+          setDescription(e.target.value);
+        }}
+        value={description}
+      ></textarea>
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+
+----------------------------------------------------------------------------
+[TaskCard]
+
+function TaskCard({ task }) {  // recibe los objetos de funcion map del array tasks
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+----------------------------------------------------------------------------
+[TaskList]
+
+import TaskCard from "./TaskCard";
+
+function TaskList({ tasks }) {              // recibe el array de objetos tasks
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (            
+        <TaskCard key={task.id} task={task} /> // key c/elemento y envio objetos 
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+----------------------------------------------------------------------------
+[App]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+import { tasks as data } from "./data/tasks";
+import { useState, useEffect } from "react";
+
+function App() {
+  const [tasks, setTasks] = useState([]); // nuevo array tasks vacio
+
+  useEffect(() => {
+    setTasks(data);           // se llena el array con los datos del array original
+  }, []);                     // solo se ejecuta una vez c/carga el componente
+
+  function createTask(task) { // recibe objeto c/propiedades 
+    setTasks([                // las agrega al array de objetos 
+      ...tasks,               // existente en un nuevo objeto
+      {
+        title: task.title,
+        id: tasks.length,
+        description: task.description,
+      },
+    ]);
+  }
+
+  return (
+    <div>
+      <TaskList tasks={tasks} />              {/* se envia arreglo tasks */}
+      <TaskForm createTask={createTask} />    {/* se envia funcion */}
+    </div>
+  );
+}
+
+export default App;
+
+
+----------------------------------------------------------------------------

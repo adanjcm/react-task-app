@@ -1,0 +1,1087 @@
+TailwindCSS
+
+bajamos el modulo:
+es un framework de css el cual nos sirve para poder estilizar nuestra aplicacion,
+
+* podemos utilizar CSS en nuesta aplicacion sin ningun problema,
+ de hecho si me voy al "index.css" 
+
+ y quiero estilizarlo le coloco:
+
+[index.css]
+
+ body {
+    background-color: #202020;
+}
+
+** se le aplicacion ese estilo a la aplicacion.
+fondo gris oscuro. 
+
+
+*** Pero en este caso voy a utilizar un framework
+para estilizarlo mas rapido,
+"TailwindCSS" es un framework paracido a CSS, 
+solo que ya tiene algunas clases ya creadas con nombre 
+bastante descriptivo, lo que nos que nos permite que estemos
+nombrando nosotros mismos nuestas clases.
+y tambien permite reducir el peso del codigo de CSS cuando esta 
+en produccion al utilizar otro modulo llamado "postCSS"
+
+** vamos a instalarlo:
+
+Get started (https://tailwindcss.com/docs/installation)
+
+y "framework guides" 
+y seleccionamos para instalarlo para "Vite".
+(https://tailwindcss.com/docs/guides/vite)
+
+y me da los comandos:
+
+1. crea un proyecto de Vite (ignoro porque ya he creado el proyecto)
+(Create your project)
+
+[
+npm create vite@latest my-project -- --template react
+cd my-project    
+]
+
+2. Install Tailwind CSS (esto si ejecutamos)
+(Install Tailwind CSS)
+
+(cancelamos la aplicacion, cltr+c, 2 veces )
+
+[ 
+   --- y ejecutamos e instalara estos 3 (npm install -D tailwindcss postcss autoprefixer) estos son modulos que necesita tailwindcss para funcionar. ---
+
+➜  reac-tasks-application npm install -D tailwindcss postcss autoprefixer
+
+added 56 packages, and audited 139 packages in 27s
+
+20 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+** De esta forma se instalan modulos en react.
+
+
+--- lo siguiente es inicializar tailwindcss ---
+
+➜  react-tasks-application npx tailwindcss init -p
+
+
+Created Tailwind CSS config file: tailwind.config.cjs
+Created PostCSS config file: postcss.config.cjs
+
+** el comando lo que hace es crear un archivo de configuracion 
+en nuestro proyecto, mejor dicho un par de 
+archivos de configuracion (tailwind.config.cjs y postcss.config.cjs).
+
+]
+
+3. lo siguiente me dice que actualice el archivo "tailwind.config.cjs"
+(Configure your template paths)
+
+
+[ copiamos esto  y me voy a "tailwind.config.cjs"
+y quito el (content: [],) que tiene y coloco el siguiente:
+
+
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+
+
+[tailwind.config.cjs]
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+]
+
+4. lo siguiente es anadir en "index.css" 
+estos estilos de aqui.
+(Add the Tailwind directives to your CSS)
+
+[ anadimos en "index.css" estos estilos de aqui.
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;  
+
+[index.css]
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities; 
+
+** Guardo y listo, 
+con esto ya tengo tailwind y ya puedo empezar a utilizarlo
+]
+
+4.5. (opcional a mi no me aparece) que me asegure de que esta siendo importando desde (main.js)
+( import the CSS file
+Import the newly-created "./src/index.css" file in your ".src/main.js" file 
+
+[ main.js -- ejemplo --
+
+import {createApp } from 'vue'
+import App from './App.vue'
+import './index.css'
+
+create(App).mount('#App')
+
+
+[ main.js -- mi aplicacion  -- 
+Podemos ver que ya esta siendo importando (import "./index.css";)
+porque ya venia configurado asi.
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+import { TaskContextProvider } from "./context/TaskContext"; // componente global
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <TaskContextProvider>   
+      <App />
+    </TaskContextProvider>
+  </React.StrictMode>
+);
+
+]
+
+Nota: ya podemos empezar el proyecto.
+
+]
+
+
+5. inicializamos/empezamo el proyecto.
+(Start your build process)
+Run your build process with [npm run dev]
+
+[
+si vengo a la aplicacion ahora no luce en nada porque ha reseteado los botones y estilos.
+
+Escribe tu tarea
+                    Escribe la descripcion de la tarea
+                                                        Guardar
+mi primer tarea
+mi primer tarea
+
+Eliminar tarea
+mi segunda tarea
+mi segunda tarea
+
+Eliminar tarea
+mi tercer tarea
+mi tercer tarea
+
+Eliminar tarea
+
+** pero apartir de aqui puedo empezar a estilizar.
+
+]
+
+
+
+6. Start using Tailwind in your project
+Start using Tailwind’s utility classes to style your content.
+
+[ en App.jsx
+
+export default function App() {
+  return (
+    <h1 className="text-3xl font-bold underline">
+      Hello world!
+    </h1>
+  )
+}    
+]
+
+-------------------------------------------------------------------
+
+    ** comenzamos a estilizar el codigo **
+
+Este framework tiene una extension de vscode que ayuda con el autocompletado
+buscamos "Tailwind CSS IntelliSense" y la instalamos.
+
+esta extension lo que hace es que va a leer que existe el archivo (tailwind.con.cjs) significa que en este proyecto esta utilizando "tailwind"
+
+-------------------------------------------------------------------
+[TaskCard - original sin estilo -]
+
+import { useContext } from "react"; // para poder usar contexto (TaskContext)
+import { TaskContext } from "../context/TaskContext"; // importo nombre contexto
+
+function TaskCard({ task }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  // uso el contexto (TaskContext) y estructuro,s/traigo fn deletTask del objeto (value)
+  const { deleteTask } = useContext(TaskContext);
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+-----------------------------------------------------------------
+
+// ** ahora puedo venir [TaskCard] y darle estilos de "tailwind".
+
+y le digo quiero convertir estas tarjetas en algo que luzca como una tarjeta.
+le coloco un "className" al div y aqui utilizo clases de tailwind,
+si presiono (cltr+space) pueden ver algunas cuantas clases que vienen desde "tailwind", ya puedo empezar a utilizarla.
+
+y este caso quiero decirle quiero utilizar un (bg-gray-800) y vscode me da autocompletado (<div className="bg-gray-800">)
+y con esto ya cambia el color de la aplicacion/pagina (solo para el TaskCard),
+porque el input y textarea no sufren cambios.
+
+doy un espacio y tambien le digo el texto va ser "blanco"
+(<div className="bg-gray-800 text-white">)
+y ya pone el texto en blanco.
+
+
+[TaskCard - con estilos de tailwind - ]
+
+import { useContext } from "react"; // para poder usar contexto (TaskContext)
+import { TaskContext } from "../context/TaskContext"; // importo nombre contexto
+
+function TaskCard({ task }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  // uso el contexto (TaskContext) y estructuro,s/traigo fn deletTask del objeto (value)
+  const { deleteTask } = useContext(TaskContext);
+
+  return (
+    <div className="bg-gray-800 text-white">
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+-----------------------------------------------------------------
+// ** y como aqui hay multiples tarjetas, yo le quiero decir que esten una a lado de otra, como en un "grid"
+
+[App - original sin estilos -]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+
+function App() {
+  return (
+    <>
+      <TaskForm />
+      <TaskList />
+    </>
+  );
+}
+
+export default App;
+-----------------------------------------------------------------
+
+** ahora me voy a "App" porque "App" contiene el componente "TaskLisk" (<TaskList />)
+
+[App - con estilos tailwind-]
+
+-----------------------------------------------------------------
+[TaskList - sin estilos -]
+
+import TaskCard from "./TaskCard";
+import { useContext } from "react"; // importamos contexto (TaskContext) para usar
+import { TaskContext } from "../context/TaskContext"; // importo nombre de contexto
+
+function TaskList() {
+  // ahora puedes acceder directamente al contexto (TaskContext)
+
+  // uso contexto y extraigo s/tasks del objeto de valores (value) de TaskContext
+  const { tasks } = useContext(TaskContext); 
+
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} /> // key c/elemento y envio objetos
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+-----------------------------------------------------------------
+
+-- y "TaskLisk" contiene un div y contiene adentro todas las tareas (tasks)
+entonces voy a decirle este div va contener una clase que va ser un "grid y luego le coloco un grid-cols-la cantidad de columnas qeu quiero, 
+en este caso quiero que exista 4 columnas
+(<div className="grid grid-cols-4">)
+
+** guardo y me aparece 3 columnas xq no tengo una cuarta,
+pero la anado y ya me aperece la cuarta columna.
+
+-- ahora no parecen tarjeta, 
+asi que le doy un espacio entre ellas,
+le digo va a ver un "gap" de 2,
+un gap es como decir un espacio entre los cuadros.
+(<div className="grid grid-cols-4 gap-2">)
+
+** se coloco un espacio entre ellas,
+ahora si anado mas tarjetas,
+vemos que se anaden una debajo de la otra.
+
+
+[TaskList - con estilos tailwind-]
+
+import TaskCard from "./TaskCard";
+import { useContext } from "react"; // importamos contexto (TaskContext) para usar
+import { TaskContext } from "../context/TaskContext"; // importo nombre de contexto
+
+function TaskList() {
+  // ahora puedes acceder directamente al contexto (TaskContext)
+
+  // uso contexto y extraigo s/tasks del objeto de valores (value) de TaskContext
+  const { tasks } = useContext(TaskContext); 
+
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div className="grid grid-cols-4 gap-2">
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} /> // key c/elemento y envio objetos
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+-----------------------------------------------------------------
+// ** -- ahora coloco un padding a estas tarjetas
+quiero que estas tarjetas tengan un padding,
+el padding se coloca con (p-numero de padding)
+por ejemplo quiero un padding de 4. en "TaskCard"
+(<div className="bg-gray-800 text-white p-4">)
+
+** le agrega padding
+
+-- le digo quiero un border redondeado 
+(<div className="bg-gray-800 text-white p-4 rounded-md">)
+
+** le agrega borde redondeado
+
+-- En cuanto al titulo (h1)
+quiero que este h1 luzca realmente como un titulo,
+y le coloco un "text-xl" es como decir extra large
+(<h1 className="text-xl">{task.title}</h1>)
+
+** el titulo de la tarjeta (mi primer tarea) ya se nota mas grande
+que el resto. 
+
+-- luego le digo que sea un "font-bold"
+(<h1 className="text-xl font-bold">{task.title}</h1>)
+
+** ya me aparece en bold/negrita el titulo (h1)
+
+-- ahora le digo que aparezca el titulo (h1) en mayuscula 
+(<h1 className="text-xl font-bold capitalize">{task.title}</h1>)
+
+** ya aparece cada palabra inicia en mayuscula 
+(Mi Primer Tarea)
+
+-- al parrafo le pongo un text-gray, le coloco un tono mas tenue
+(<p className="text-gray-500">{task.description}</p>)
+
+** el parrafo aparece un color gris claro, el resto de color blanco.
+
+--- y le coloco un texto mas pequeno, es como decir small. 
+(<p className="text-gray-500 text-sm">{task.description}</p>)
+
+** ya aparece el texto del parrafo pequeno.
+
+-- En cuanto al boton Eliminar Tareas,
+este boton va a tener una clase "bg-red-500"
+(<button className="bg-red-500" onClick={() => deleteTask(task.id)}>Eliminar tarea</button>)
+
+** ya aparece el boton en rojo 
+
+-- luego le digo un padding en x, en los lados de 2.
+(<button className="bg-red-500 px-2" onClick={() => deleteTask(task.id)}>Eliminar tarea</button>)
+
+** ya aparece un padding a los lados del boton.
+
+-- luego padding arriba, un padding y de 1.
+(<button className="bg-red-500 px-2 py-1" onClick={() => deleteTask(task.id)}>Eliminar tarea</button>)
+
+** ya aparece padding superior
+
+-- luego le agrego un rounded mediano para que sea un borde redondeado
+(<button className="bg-red-500 px-2 py-1 rounded-md" onClick={() => deleteTask(task.id)}>Eliminar tarea</button>)
+
+** ya aperece redondeado el borde del boton
+
+-- voy a decirle que separe del elemento de arriba (p).
+le coloco margin top de 4.
+(<button className="bg-red-500 px-2 py-1 rounded-md mt-4" onClick={() => deleteTask(task.id)}>Eliminar tarea</button>)
+
+** ya esta separado del parrafo 
+
+Listo. de esta forma ya estoy estilizando.
+
+
+[TaskCard - con estilos tailwind -]
+
+import { useContext } from "react"; // para poder usar contexto (TaskContext)
+import { TaskContext } from "../context/TaskContext"; // importo nombre contexto
+
+function TaskCard({ task }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  // uso el contexto (TaskContext) y estructuro,s/traigo fn deletTask del objeto (value)
+  const { deleteTask } = useContext(TaskContext);
+
+  return (
+    <div className="bg-gray-800 text-white p-4 rounded-md">
+      <h1 className="text-xl font-bold capitalize">{task.title}</h1>
+      <p className="text-gray-500 text-sm">{task.description}</p>
+      <button className="bg-red-500 px-2 py-1 rounded-md mt-4" onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+-----------------------------------------------------------------
+// ** ya tenemos una grilla (grid en TaskList) pero esta demasiado pegada a los lados. 
+
+-- voy a decirle el que contien todo,
+vamos a colocarle un contendor (div).
+
+el contendor le va anadir un espaciado a los lados.
+
+-----------------------------------------------------------------
+
+[App - sin estilos]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+
+function App() {
+  return (
+    <>
+      <TaskForm />
+      <TaskList />
+    </>
+  );
+}
+
+export default App;
+
+-----------------------------------------------------------------
+-- me voy a "App" y le digo 
+y ahora coloco un (main o div u otra etiqueta),
+en lugar de (<>)
+
+-- coloco un main y le coloco un className y le colocamos 
+un color para verlo, es un color oscuro.
+( <main className="bg-zinc-900"> )
+
+** ya aperece el contener oscuro que contiene las tasjetas dentro,
+pero solo abarca esa seccion.
+
+-- y para que ocupe todo el alto de la pantalla le digo "h-screen"
+(<main className="bg-zinc-900 h-screen">)
+
+** ahora el fondo oscuro abarca toda la pagina.
+
+-- lo siguien es decirle que estos de aqui, van a estar dentro de un contenedor
+
+(
+<TaskForm />
+<TaskList />    
+)
+
+-- voy a decirle esto va a estar dentro de un (div)
+y este div va a tener una clase llamada "container"
+
+[
+<div className="container">
+    <TaskForm />
+    <TaskList />
+</div>    
+]
+
+** guardo y veo que no aplicado, nada,
+no ha aplicado el "container",
+por ahora el tamanio normal del container se pega a la izquierda las tarjetas
+y del lado derecho deja un gran espacio.
+
+-- en este caso si le colocamos un color al "container",
+bg-yellow
+
+[
+<div className="container bg-yellow-400">
+    <TaskForm />
+    <TaskList />
+</div>
+]
+
+** ahora vemos el "container" de fondo amarillo que envuelve
+a las tarjetas, y por detras esta el fondo oscuro y esta pegado a la izquierda
+(<main className="bg-zinc-900 h-screen">) que cubre toda la pantalla.
+
+-- le quitamos lo pegado a la izquierda,
+le coloco "mx-auto" que es como decir coloca en automatico los margenes
+en el eje de las "x"
+
+[
+<div className="container mx-auto bg-yellow-400">
+    <TaskForm />
+    <TaskList />
+</div>    
+]
+
+** ahora si aparecen centradas las tarjetas.
+pero pegadas a los lados.
+
+-- le quito el color amarillo del fondo
+** se quito el fondo amarillo y ya me agrega mas tareas de forma ordenada
+
+[
+<div className="container mx-auto">
+  <TaskForm />
+  <TaskList />
+</div>
+
+]
+
+
+[App - con estilos tailwind -]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+
+function App() {
+  return (
+    <main className="bg-zinc-900 h-screen">
+      <div className="container mx-auto">
+        <TaskForm />
+        <TaskList />
+      </div>
+    </main>
+  );
+}
+
+export default App;
+
+-----------------------------------------------------------------
+-- ahora si le doy en el boton "Eliminar Tarea",
+no parece un boton, parece una imagen,
+para que parezca un boton, nos vamos a "TaskCard" nuevamente.
+
+-- al boton vamos a colocarle una clase que se llama "hover" y le digo 
+que el "bg-red va a cambiar a 400 cuando se posicione el cursor encima del boton"
+
+[
+<button
+    className="bg-red-500 px-2 py-1 rounded-md mt-4 hover:bg-red-400"
+    onClick={() => deleteTask(task.id)}
+>    
+]
+
+** ahora cuando coloco el cursor sobre el boton (Eliminar Tarea)
+cambia a un rojoa mas tenue,
+y ya parece un boton.
+
+y listo. refresco.
+y nuevamente aparecen las 3 tareas,
+porque esas son las tareas que cargan inicialmente 
+
+
+[TaskCard - con estilos tailwind -]
+
+import { useContext } from "react"; // para poder usar contexto (TaskContext)
+import { TaskContext } from "../context/TaskContext"; // importo nombre contexto
+
+function TaskCard({ task }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  // uso el contexto (TaskContext) y estructuro,s/traigo fn deletTask del objeto (value)
+  const { deleteTask } = useContext(TaskContext);
+
+  return (
+    <div className="bg-gray-800 text-white p-4 rounded-md">
+      <h1 className="text-xl font-bold capitalize">{task.title}</h1>
+      <p className="text-gray-500 text-sm">{task.description}</p>
+      <button
+        className="bg-red-500 px-2 py-1 rounded-md mt-4 hover:bg-red-400"
+        onClick={() => deleteTask(task.id)}
+      >
+        Eliminar tarea
+      </button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+-----------------------------------------------------------------
+-- En cuanto al formulario tambien vamos a mejorarlo
+nos vamos a "TaskForm" 
+
+-----------------------------------------------------------------
+[TaskForm - original sin estilos -]
+
+import { useState, useContext } from "react"; // p/usar contexto
+import { TaskContext } from "../context/TaskContext"; // importo contexto
+
+function TaskForm() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  // uso contexto y estructuro y solo quiero fn createTask
+  const { createTask } = useContext(TaskContext);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createTask({ title, description }); // enviamos objeto con estas propiedades
+    setTitle(""); // resetea a vacio los inputs despues de
+    setDescription(""); // enviar los valores de la fn createTask
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+        value={title}
+        autoFocus
+      />
+      <textarea
+        placeholder="Escribe la descripcion de la tarea"
+        onChange={(e) => {
+          setDescription(e.target.value);
+        }}
+        value={description}
+      ></textarea>
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+-----------------------------------------------------------------
+
+-----------------------------------------------------------------
+-- mejoramos el "TaskForm"
+
+-- le digo al formulario (form) para que parezca una tarjeta,
+le digo className bg-slate-800 
+(<form onSubmit={handleSubmit} className="bg-slate-800">)
+
+** ya se nota ese fondo con ese color tipo azul marino que separa
+al formulario de las tarjetas.
+
+-- luego le coloco un padding de 10
+(<form onSubmit={handleSubmit} className="bg-slate-800 p-10">)
+
+** ya se nota el padding en todos los lados.
+
+-- luego le coloco un espaciado hacia abajo de las tarjetas,
+margin botton de 4,
+(<form onSubmit={handleSubmit} className="bg-slate-800 p-10 mb-4">)
+
+** ya se nota la separacion entre el formulario y el contenedor de las tarjetas.
+
+-- de hecho el contenedor tambien deberia tener un espacio, 
+entonces voy a decirle que el "container" va a tener un padding 
+de 10 hacia todos los lados. En "App"
+
+-- y tambien voy a decirle que estos inputs (input, textarea) esten centrado  "TaskForm" 
+
+-- le digo todo este formulario (form) 
+vamos a colocarlo dentro de otro contenedor, coloco un (div)
+y este div va a contener al formulario (form)
+
+y este (div) lo unico que va a tener es una clase que se llame 
+"max-w-md", esto establece un ancho predeterminado
+(<div className="max-w-md">)
+
+** le establecio un ancho predeterminado 
+
+-- y lo voy a centrar con mx-auto
+(<div className="max-w-md mx-auto">)
+
+** ya tenemos centrado el formulario.
+ahora si anado una tarea nueva se anade,
+y pueden ver que esta centrado el formulario
+
+[
+  return (
+    <div className="max-w-md mx-auto">
+      <form onSubmit={handleSubmit} className="bg-slate-800 p-10 mb-4">
+        <input
+          placeholder="Escribe tu tarea"
+          onChange={(e) => {
+            setTitle(e.target.value);
+          }}
+          value={title}
+          autoFocus
+        />
+        <textarea
+          placeholder="Escribe la descripcion de la tarea"
+          onChange={(e) => {
+            setDescription(e.target.value);
+          }}
+          value={description}
+        ></textarea>
+        <button>Guardar</button>
+      </form>
+    </div>
+  );
+]
+
+
+-- ahora vamos a solucionar estos inputs.
+este input va a tener un className de bg-slate-300
+y un padding hacia todos los lados de 3 (p-3)
+y le digo un w-full para que abarque todo el ancho maximo.
+tambien un margin botton de 2 para que se separe
+
+( -clase del input- className="bg-slate-300 p-3 w-full mb-2" )
+
+** el input ya cambio de color a un gris claro,
+y un padding a los lados de 3,
+tambien w-full ya abarca todo el ancho maximo
+y con el mb-2 ya se separo el input del textarea
+
+-- ahora esta clase el "input" tambien se la coloco 
+al "textarea" 
+( ( -clase del textarea- className="bg-slate-300 p-3 w-full mb-2" ))
+
+** ahora el textarea luce como un input.
+
+-- en cuanto al texto lo dejo asi
+
+-- en cuanto al boton Guardar,
+simplemente va a tener algunas clases,
+le colocamos un "bg-indigo-500"
+(<button className="bg-indigo-500">Guardar</button>)
+
+** coloca el boton de color indigo
+
+-- colocamos un padding en x de 3 y un padding en y de 1
+y tambien le colocamos un texto en blanco
+(<button className="bg-indigo-500 px-3 py-1 text-white">Guardar</button>)
+
+** ya aparace el boton en color indigio con sus paddings y el texto en blanco.
+
+-- arriba de los inputs le colocamos un texto que diga "Crea tu tarea"
+dentro del formulario (form) colocamos un h1 que diga "Crea tu tarea"
+y le colocamos una clase al h1 text-2xl, que seria como el doble de extra large
+(<h1 className="text-2xl">Crea tu tarea</h1>)
+
+** ya aparece "Crea tu tarea" arriba de los inpus.
+
+-- ahora le colocamos un 'font-bold' y un texto en blanco y un margin botton de 3
+(<h1 className="text-2xl font-bold text-white mb-3">Crea tu tarea</h1>)
+
+** ya el titulo (h1) esta en bold y en blanco
+y tambien ya se separo de los inputs, del margen inferior en 3.
+
+
+*** entonces si yo refresco queda centrado el formulario 
+y las tarjetas debajo centradas y puedo anadir tareas nuevas
+y tambien aparecen centradas,
+y tambien puedo ir elimando las tarjetas.
+
+
+[TaskForm - con estilos tailwind -]
+
+import { useState, useContext } from "react"; // p/usar contexto
+import { TaskContext } from "../context/TaskContext"; // importo contexto
+
+function TaskForm() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  // uso contexto y estructuro y solo quiero fn createTask
+  const { createTask } = useContext(TaskContext);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createTask({ title, description }); // enviamos objeto con estas propiedades
+    setTitle(""); // resetea a vacio los inputs despues de
+    setDescription(""); // enviar los valores de la fn createTask
+  };
+
+  return (
+    <div className="max-w-md mx-auto"> {/*centra tarjetas*/}
+      <form onSubmit={handleSubmit} className="bg-slate-800 p-10 mb-4">
+        <h1 className="text-2xl font-bold text-white mb-3">Crea tu tarea</h1>
+        <input
+          placeholder="Escribe tu tarea"
+          onChange={(e) => {
+            setTitle(e.target.value);
+          }}
+          value={title}
+          className="bg-slate-300 p-3 w-full mb-2"
+          autoFocus
+        />
+        <textarea
+          placeholder="Escribe la descripcion de la tarea"
+          onChange={(e) => {
+            setDescription(e.target.value);
+          }}
+          className="bg-slate-300 p-3 w-full mb-2"
+          value={description}
+        ></textarea>
+        <button className="bg-indigo-500 px-3 py-1 text-white">Guardar</button>
+      </form>
+    </div>
+  );
+}
+
+export default TaskForm;
+-----------------------------------------------------------------
+
+Nota: de esta forma ya estaria nuestra aplicacion,
+solo me falta una cosa mas y es que cuando elimino todas
+las tareas, me aparece "no hay tareas aun" debajo del formulario.
+
+nos vamos al "TaskLisk" y le digo al h1 vas a estar estilizado 
+con un text white para que se vea,
+y luego le digo text-4xl para que se vea,
+y font-bold y text-center
+(return <h1 className="text-white text-4xl font-bold text-center">No hay tareas aun</h1>;)
+
+** guardo y aparce "No hay tareas aun" centrado en bold y en blanco centrado.
+
+Nota: de esta forma ya tengo la forma de poder decirle que no hay tareas aun.
+y puedo crear una tarea y se va a actualizando.
+
+--- con esto ya tenemos estilizado nuestra aplicacion ---
+
+
+[TaskLisk - con estilos tailwind]
+
+import TaskCard from "./TaskCard";
+import { useContext } from "react"; // importamos contexto (TaskContext) para usar
+import { TaskContext } from "../context/TaskContext"; // importo nombre de contexto
+
+function TaskList() {
+  // ahora puedes acceder directamente al contexto (TaskContext)
+
+  // uso contexto y extraigo s/tasks del objeto de valores (value) de TaskContext
+  const { tasks } = useContext(TaskContext); 
+
+  if (tasks.length === 0) {
+    return <h1 className="text-white text-4xl font-bold text-center">No hay tareas aun</h1>;
+  }
+
+  return (
+    <div className="grid grid-cols-4 gap-2">
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} /> // key c/elemento y envio objetos
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+-----------------------------------------------------------------
+ *** todo esto ya se hizo arriba, solo son extras **
+
+-- de hecho el contenedor tambien deberia tener un espacio, 
+entonces voy a decirle que el "container" va a tener un padding 
+de 10 hacia todos los lados. En "App"
+
+[
+<div className="container mx-auto p-10">
+    <TaskForm />
+    <TaskList />
+</div>    
+]
+
+** ya aparece el padding en todos los ladod del "container"
+que incluye el "TaskForm y TaskLisk". 
+
+
+[App - con estilos tailwind]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+
+function App() {
+  return (
+    <main className="bg-zinc-900 h-screen">
+      <div className="container mx-auto p-10">
+        <TaskForm />
+        <TaskList />
+      </div>
+    </main>
+  );
+}
+
+export default App;
+
+-----------------------------------------------------------------
+-- y tambien voy a decirle que estos inputs (input, textarea) esten centrado  "TaskForm" 
+
+** aqui termina lo extra  que ya esta hecho arriba **
+
+-----------------------------------------------------------------
+
+codigo final con estilos tailwind
+
+[ TaskForm ]
+
+import { useState, useContext } from "react"; // p/usar contexto
+import { TaskContext } from "../context/TaskContext"; // importo contexto
+
+function TaskForm() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  // uso contexto y estructuro y solo quiero fn createTask
+  const { createTask } = useContext(TaskContext);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createTask({ title, description }); // enviamos objeto con estas propiedades
+    setTitle(""); // resetea a vacio los inputs despues de
+    setDescription(""); // enviar los valores de la fn createTask
+  };
+
+  return (
+    <div className="max-w-md mx-auto"> {/*centra tarjetas*/}
+      <form onSubmit={handleSubmit} className="bg-slate-800 p-10 mb-4">
+        <h1 className="text-2xl font-bold text-white mb-3">Crea tu tarea</h1>
+        <input
+          placeholder="Escribe tu tarea"
+          onChange={(e) => {
+            setTitle(e.target.value);
+          }}
+          value={title}
+          className="bg-slate-300 p-3 w-full mb-2"
+          autoFocus
+        />
+        <textarea
+          placeholder="Escribe la descripcion de la tarea"
+          onChange={(e) => {
+            setDescription(e.target.value);
+          }}
+          className="bg-slate-300 p-3 w-full mb-2"
+          value={description}
+        ></textarea>
+        <button className="bg-indigo-500 px-3 py-1 text-white">Guardar</button>
+      </form>
+    </div>
+  );
+}
+
+export default TaskForm;
+
+
+[ TaskCard ]
+
+import { useContext } from "react"; // para poder usar contexto (TaskContext)
+import { TaskContext } from "../context/TaskContext"; // importo nombre contexto
+
+function TaskCard({ task }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  // uso el contexto (TaskContext) y estructuro,s/traigo fn deletTask del objeto (value)
+  const { deleteTask } = useContext(TaskContext);
+
+  return (
+    <div className="bg-gray-800 text-white p-4 rounded-md">
+      <h1 className="text-xl font-bold capitalize">{task.title}</h1>
+      <p className="text-gray-500 text-sm">{task.description}</p>
+      <button
+        className="bg-red-500 px-2 py-1 rounded-md mt-4 hover:bg-red-400"
+        onClick={() => deleteTask(task.id)}
+      >
+        Eliminar tarea
+      </button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+
+[ App ]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+
+function App() {
+  return (
+    <main className="bg-zinc-900 h-screen">
+      <div className="container mx-auto p-10"> {/*centra tarjetas*/}
+        <TaskForm />
+        <TaskList />
+      </div>
+    </main>
+  );
+}
+
+export default App;
+
+
+[ TaskLisk ]
+
+import TaskCard from "./TaskCard";
+import { useContext } from "react"; // importamos contexto (TaskContext) para usar
+import { TaskContext } from "../context/TaskContext"; // importo nombre de contexto
+
+function TaskList() {
+  // ahora puedes acceder directamente al contexto (TaskContext)
+
+  // uso contexto y extraigo s/tasks del objeto de valores (value) de TaskContext
+  const { tasks } = useContext(TaskContext); 
+
+  if (tasks.length === 0) {
+    return <h1 className="text-white text-4xl font-bold text-center">No hay tareas aun</h1>;
+  }
+
+  return (
+    <div className="grid grid-cols-4 gap-2">
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} /> // key c/elemento y envio objetos
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+Nota: los demas componentes no se estilizaron con tailwind.
+
+
+

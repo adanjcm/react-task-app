@@ -1,0 +1,451 @@
+vitejs es una herramienta mas compleja ya que necesita otros modulos para trabajar,
+esta herramienta sirve para otros frameworks como vue, angular, svelte, etc.
+
+En nuestro caso vamos a crear un proyecto desde cero.
+
+No necesitamos instalar nada, 
+ya esta todo instalado, 
+porque hemos instalado node al inicio,
+podemos utilizar node para utilizar vitejs.
+
+** creamos un proyecto con vitejs:
+
+➜  react-Fazt npm create vite
+✔ Project name: … react-tasks-application
+? Select a framework: › - Use arrow-keys. Return to submit.
+❯   Vanilla
+    Vue
+    React	(enter)
+    Preact
+    Lit
+    Svelte
+    Others
+
+? Select a variant: › - Use arrow-keys. Return to submit.
+❯   JavaScript	(enter)
+    TypeScript
+    JavaScript + SWC
+    TypeScript + SWC
+
+------------------ completado ------------------
+
+react-course  real-vite-example
+➜  react-Fazt npm create vite
+✔ Project name: … react-tasks-application
+✔ Select a framework: › React
+✔ Select a variant: › JavaScript
+
+Scaffolding project in /home/adan/Dev/Technologies-and-Programming-Languages/fazt/react-Fazt/react-tasks-application...
+
+Done. Now run:
+
+  cd react-tasks-application
+  npm install
+  npm run dev
+
+➜  react-Fazt 
+
+➜  react-Fazt ls 
+react-course  react-tasks-application  real-vite-example
+➜  react-Fazt cd react-tasks-application 
+➜  react-tasks-application code .
+
+
+** Apartir de aqui empezamos la instalacion del proyecto ** 
+
+1. Intalamos las dependecias de este proyecto:
+
+➜  react-tasks-application npm install
+
+added 82 packages, and audited 83 packages in 41s
+
+8 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+➜  react-tasks-application 
+
+** aparece una carpeta nueva (node_modules)
+que contiene los paquetes/dependecias que utiliza react para funcionar
+
+2. siguiente ejecutamos el comando npm run dev, 
+equivalente a (npm start en create-react-app) 
+
+
+➜  react-tasks-application npm run dev
+
+> react-tasks-application@0.0.0 dev
+> vite
+
+
+  VITE v4.0.4  ready in 1476 ms
+
+  ➜  Local:   http://127.0.0.1:5173/
+  ➜  Network: use --host to expose
+  ➜  press h to show help
+
+** y esto me dice que hay un proyecto en el Local:   http://127.0.0.1:5173/, si le doy al enlace Ctrl + click lo abre en una ventana nueva. 
+
+y lo que estamos viendo es un proyecto nuevo utilizando vitejs.
+
+-------------------------------------------------------------------
+Vite logoReact logo
+Vite + React
+count is 4
+Edit src/App.jsx and save to test HMR
+
+Click on the Vite and React logos to learn more
+
+-------------------------------------------------------------------
+
+y lo unico que tenemos es un ejemplo de un contador,
+en que a medida de que voy dando un click se va incrementando.
+
+y si voy al codigo al carpeta "src" y esto es muy similar a "create-react-app" en el que estan los archivos de JavaScript y CSS.
+
+y pueden ver que vitejs se utiliza mucho la sintaxis ".jsx",
+en vitejs no es opcional si es requerido utilizar la sintaxis ".jsx" para crear componentes de React.
+
+Aqui si es necesario colocar esta extension.
+
+y esto nos va a dar una idea de como vamos a trabajar con componentes de react y tambien cuando solo estemos trabajando tan solo con JavaScript.
+
+-------------------------------------------------------------------
+** Si voy a "src/App.jsx" que es el componente 
+
+
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import './App.css'
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div className="App">
+      <div>
+        <a href="https://vitejs.dev" target="_blank">
+          <img src="/vite.svg" className="logo" alt="Vite logo" />
+        </a>
+        <a href="https://reactjs.org" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
+      </div>
+      <h1>Vite + React</h1>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
+        <p>
+          Edit <code>src/App.jsx</code> and save to test HMR
+        </p>
+      </div>
+      <p className="read-the-docs">
+        Click on the Vite and React logos to learn more
+      </p>
+    </div>
+  )
+}
+
+export default App
+
+** muesta un div con 2 enlaces que tiene imagenes,
+luego el h1 
+luego un div con un boton y una etiqueta p, que es basicamente un contador (count is 12)
+
+vamos a eliminar todo el codigo.
+-------------------------------------------------------------------
+
+// ** nuevo codigo para el proyecto
+
+1. creamos una funcion basica
+2. exportamos default el componente
+
+[src/App.jsx]
+
+function App() {
+  return <h1>Hola Mundo</h1>
+}
+
+export default App
+
+** navegador:
+Hola Mundo
+
+Nota: en el projecto carpeta hay archivos css para el estilo del proyecto.
+
+-------------------------------------------------------------------
+Nota: eliminamos esto porque no lo estamos utilizando.
+
+[App.css original]
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+-------------------------------------------------------------------
+** tambien eliminamos esto.
+
+[index.css original]
+
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+-------------------------------------------------------------------
+** Eliminando estos archivos de ccs, 
+1. solo con el nuevo codigo del componente App.jsx ya tengo una applicacion sencilla de vite.
+
+2. en la carpeta "src" hay una carpeta 'assets' que ahi colocamos 'svg' o imagenes o logotipos que queramos cargar dentro de la aplicacion 
+
+3. y un archivo 'main.jsx' que es el equivalente al "index.js" 
+de 'create-react-app' 
+-------------------------------------------------------------------
+** tambien eliminamos esto.
+
+[main.jsx]
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+** este codigo es similar al que hemos usado,
+solo que en este no esta creando una variando,
+esta renderizando directo la aplicacion.
+
+** Lo unico distinto que van a ver es esto que dice:
+    <React.StrictMode> 
+    y es porque cuando trabajamos con react es recomendado utilizar esta etiqueta (<React.StrictMode>),
+    que basicamente quiere decir que va a ver una especie de codigo que se va a ejecutar adicionalmente en desarrollo,
+    para saber si estas escribiendo codigo correcto en React. 
+
+    Es como una especie de recomendaciones que te va dando el propio entorno de desarrollo para que puedas corregir algunos errores.
+
+    Es bastante util y es una buena practica dejarlo ahi.
+
+
+Con esta ya tenemos nuestro proyecto.
+
+Una cosa mas.
+
+** Aqui tenemos un "index.html",
+en este caso no esta dentro de la carperta "public",
+pero no hay problema.
+
+Al final nosotros vamos a trabajar con la carperta "src"
+y al final todo el proyecto se va a generar igual que en 
+"create-react-app".
+
+** otra cosa mas, cancelamos la consola (Ctrl + c)
+
+y para construir es igual que "create-react-app" con (npm run build)
+
+➜  react-tasks-application npm run build
+
+> react-tasks-application@0.0.0 build
+> vite build
+
+vite v4.0.4 building for production...
+✓ 32 modules transformed.
+dist/index.html                  0.39 kB
+dist/assets/index-69cedf74.js  142.88 kB │ gzip: 45.86 kB
+➜  react-tasks-application 
+
+** esto crea una carpeta llamada "dist" 
+y ahi esta el codigo convertido.
+Es lo mismo al final.
+
+-------------------------------------------------------------------
+
+[index.html original]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+-------------------------------------------------------------------
+// ** configuramos extensiones de vscode para trabajar con react
+
+1. tema: Ayu en modo Ayu Dark border
+2. emmet: >user settings (sin JSON)
+    escribes "emmet" y te lleva a la configuracion 
+    nos vamos a la parte de Include Languages
+    y van a ver que esta incluido
+    For example: {"vue-html": "html", "javascript": "javascriptreact"}
+    En mi caso ya esta configurado esta configuracion de emmet.
+    para vue ("vue-html": "html") y para jsx ("javascript": "javascriptreact").
+
+    si por alguna razon no tiene esta parte ("javascript": "javascriptreact"),
+    le dan al boton "add-item". y escribes.
+
+    item                Value
+    javascript          javascriptreact     OK 
+
+    y esto va a anadir esta configuracion y ya esta pueden cerrar.
+    y ya lo pueden utilizarlo en el editor.
+
+
+ul>li*4>a{enlace $}
+
+  <ul>
+    <li><a href="">enlace 1</a></li>
+    <li><a href="">enlace 2</a></li>
+    <li><a href="">enlace 3</a></li>
+    <li><a href="">enlace 4</a></li>
+  </ul>
+
+3. ES7+ React/Redux/React-Native ...
+    es una serie de snippets, mejor dicho codigo que pueden utilizar para poder generar componentes rapidos.
+    son como plantillas de codigo
+
+    lo que hace es lo siguiente:
+
+    si voy a App.jsx y quiero crear esto de forma rapida.
+
+function App() {
+  return <h1>Hola Mundo</h1>
+}
+
+export default App
+
+    en lugar de escribir function ... y luego exportarla,
+    simplemente puedo escribir "rfce" y doy un enter y se autocomplementa e incluso el cursor esta en los 3 lugares, 
+    puedo colocarle HolaMundo directamente: 
+    y con esto puedo crear componentes de forma rapida.
+    me evito de estar haciendo el trabajo manual,
+    esto tambien le anade el import, pueden eliminarlo.
+
+import React from 'react'
+
+function HolaMundo() {
+  return (
+    <div>HolaMundo</div>
+  )
+}
+
+export default HolaMundo
+
+
+*** con esto ya tenemos nuestro editor configurado
+-------------------------------------------------------------------

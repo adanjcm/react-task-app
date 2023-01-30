@@ -1,0 +1,836 @@
+useContext
+
+hasta este momento tenemos un "TaskForm" y este esta recibiendo 
+como un (prop) el (TaskForm({ createTask })),  
+
+de hecho el "TaskCard" tambien esta recibiendo los (props) 
+de (TaskCard({ task, deleteTask })) 
+
+y esto se lo esta pasando el (TaskList({ tasks, deleteTask })), 
+y le esta pasando de esta forma  a "TaskCard" el 'deleteTask'
+(<TaskCard key={task.id} task={task} deleteTask={deleteTask} /> )
+
+y el "TaskList" tambien lo esta recibiendo como un (prop).
+
+Entonces si venimos a "App" pueden ver que el "TaskList" le esta pasando como como un (prop) [<TaskList tasks={tasks} deleteTask={deleteTask} />]
+
+-- De hecho vamos a ordenar un poco mejor esto.
+
+En la seccion hemos aprendido que el "TaskContext" puede almacenar un valor (x=20) que todos pueden utilizar.
+
+Entonces aqui seria un mejor lugar para decirle, 
+aqui yo tengo un estado en "App" [ const [tasks, setTasks] = useState([]); ] se lo pasamos a "TaskContext" en lugar de este valor (let x = 20;)
+
+luego tambien le digo te voy a pasar esta funcion de "App" (function createTask(task)) a "TaskContext"
+
+y tambien le voy a decir que esta funcion de "App" (function deleteTask(taskId)) tambien la paso a "TaskContext"
+
+Listo.
+-- Ahora el contexto (const [tasks, setTasks] = useState([]);)
+    tiene el estado de las tareas (tasks),
+    la funcion para crear (createTask) 
+    la funcion para eliminar (deleteTask)
+
+esto en nuestro grafico haria lo siguiente.
+
+-- ahora el "App" ya no contiene el arreglo tasks
+-- sino que ahora todos le pertencen a "TaskContext" (arreglo tasks, funcion createTask, deleteTask). 
+    De esta forma todos los componentes van a poder acceder a estos valores.
+
+** Ahora nos falta una cosa y es que que este codigo de aqui (TaskContext)
+    necesita el 'useState' para funcionar,
+    asi que lo importamos 
+    [ import { createContext, useState } from "react"; ]
+
+    luego esta funcion de aqui "createTask" no necesita nada,
+    simplemente utiliza el 'setTasks', ya lo tenemos.
+
+    y la funcion "deleteTask" tambien utiliza el 'setTasks' asi que no necesita 
+    nada mas. 
+
+** Ahora en este caso  el "valor x " (por let x = 20) ya no existe 
+    [<TaskContext.Provider value={x}>]
+    
+    ahora ya no va el "valor x" (value={x})
+    sino quiero decirle que va a tener el valor "tasks, createTask, deleteTask",
+
+    recuerden que tasks en una constante es un arreglo.
+
+    Entonces este valor (value={}) nos dice voy a interpretar codigo,
+    le puedo pasar un numero (value={2}) o un string (value={''})
+    o una lista de elementos (value={[]})
+    
+    en este cosa le digo te voy a pasar un objeto (value={ { }})
+    porque voy a estar pasandote varias cosas,
+
+    te voy a pasar por ejemplo,
+    el arreglo "tasks", asi que hago una propiedad llamada tasks que como valor va hacer el arreglo que tengo aqui (tasks)
+
+    y luego le digo tambien te voy a pasar una propiedad que se llame deleteTask
+    y va hacer el valor de lo que tiene la funcion, le paso la funcion.
+
+    y luego le digo tambien te voy a pasar una propiedad que se llame createTask
+    y va hacer el valor de lo que tiene la funcion, le paso la funcion.
+
+[
+  return (
+// *creamos ese componente global -contexto naranja- y le pasamos la propiedad value c/propiedades y valores del objeto -variables y funciones  a compartir*    
+      <TaskContext.Provider value={{
+        tasks: tasks,
+        deleteTask: deleteTask,
+        createTask: createTask
+        }}> 
+        {props.children}     {/* componente  <App /> -contiende la apliacion -*/}
+      </TaskContext.Provider>
+  );
+]
+
+Listo. 
+De  esta forma el "contexto" (TaskContext -naranja)
+ya esta cumpliendo con esto del grafico, 
+
+le estoy exportando el arreglo de tareas (tasks [])
+la funcion deleteTask, y la funcion createTask.
+
+En este caso puedo cortar todo esto
+y al final es lo mismo
+
+[
+  return (
+// *creamos ese componente global -contexto naranja- y le pasamos la propiedad value c/propiedades y valores del objeto -variables y funciones  a compartir*    
+      <TaskContext.Provider value={{
+        tasks,
+        deleteTask,
+        createTask
+        }}> 
+        {props.children}     {/* componente  <App /> -contiende la apliacion -*/}
+      </TaskContext.Provider>
+  );
+}
+]
+
+porque esto es esquivante en javascript,
+
+tasks = tasks: tasks,
+
+--------------------------------------------------------------
+[TaskContext]
+
+// "API Context" da contexto de todos los componentes, se comparte. Principal
+import { createContext, useState } from "react"; // importamos useState p/funcione
+
+export const TaskContext = createContext(); // nombre del contexto
+
+export function TaskContextProvider(props) {
+  // componente q engloba a todo
+  const [tasks, setTasks] = useState([]); // nuevo array tasks vacio (contexto -task-)
+
+  function createTask(task) {
+    // recibe objeto c/propiedades
+    setTasks([
+      // las agrega al array de objetos
+      ...tasks, // existente en un nuevo objeto
+      {
+        title: task.title,
+        id: tasks.length,
+        description: task.description,
+      },
+    ]);
+  }
+
+  function deleteTask(taskId) {
+    setTasks(tasks.filter((task) => task.id !== taskId)); // true se queda
+  }
+
+  return (
+    // *creamos ese componente global -contexto naranja- y le pasamos la propiedad value c/propiedades y valores del objeto -variables y funciones  a compartir*
+    <TaskContext.Provider
+      value={{
+        tasks,
+        deleteTask,
+        createTask,
+      }}
+    >
+      {props.children} {/* componente  <App /> -contiende la apliacion -*/}
+    </TaskContext.Provider>
+  );
+}
+--------------------------------------------------------------
+// ** ahora ya tengo el contexto (TaskContext) con los valores
+ahora simplemente tengo que utilizarlo en "App".
+
+[App]
+
+ya no tengo el arreglo de tareas (tasks)
+y tampoco ya no tengo que ejecutar este useEffect aqui.
+
+[
+  useEffect(() => {
+    setTasks(data); // se llena el array con los datos del array original
+  }, []); // solo se ejecuta una vez c/carga el componente
+]
+
+** lo que voy hacer es que este setTasks(data); ya no existe.
+ya no existe el establecer tareas aqui,
+
+asi que cortamos useEffect y lo pasamos a "TaskContext"
+
+-- ahora este "useEffect" aqui (TaskContext) funcionaria asi:
+    le digo cuando este componente (  function TaskContextProvider(props) )
+    es creado (este componente naranja - contexto)
+
+    1. el "useEffect" se va a ejecutar y lo unico que va hacer es establecer 
+    en las tareas de aqui (tasks) los datos (data),
+    estos datos venian del archivo de datos 
+    ( import { tasks as data } from "./data/tasks"; ) 
+    lo cortade de "App" y lo pegamos en "TaskContext" 
+    solo que tengo que subir un nivel
+    (import { tasks as data } from "../data/tasks";)
+
+    hace uso de useEffect, asi que lo importamos. (useState ya lo teniamos)
+    y lo eliminamos de "App"
+    (import { createContext, useState, useEffect} from "react";)
+
+
+    3. formateamos y guardamos.
+--------------------------------------------------------------
+
+[TaskContext]
+
+// "API Context" da contexto de todos los componentes, se comparte. Principal
+import { createContext, useState, useEffect } from "react"; // importamos useState p/funcione
+import { tasks as data } from "../data/tasks"; // archivo de datos (tasks)
+
+export const TaskContext = createContext(); // nombre del contexto
+
+export function TaskContextProvider(props) {
+  // componente q engloba a todo
+  const [tasks, setTasks] = useState([]); // nuevo array tasks vacio (contexto -task-)
+
+  function createTask(task) {
+    // recibe objeto c/propiedades
+    setTasks([
+      // las agrega al array de objetos
+      ...tasks, // existente, un nuevo objeto con estas propiedades/valores
+      {
+        title: task.title,
+        id: tasks.length,
+        description: task.description,
+      },
+    ]);
+  }
+
+  function deleteTask(taskId) {
+    setTasks(tasks.filter((task) => task.id !== taskId)); // true se queda
+  }
+
+  useEffect(() => {
+    setTasks(data); // se llena el array con los datos del array original
+  }, []); // solo se ejecuta una vez c/carga el componente
+
+  return (
+    // *creamos ese componente global -contexto naranja- y le pasamos la propiedad value c/propiedades y valores del objeto -variables y funciones  a compartir*
+    <TaskContext.Provider
+      value={{
+        tasks,
+        deleteTask,
+        createTask,
+      }}
+    >
+      {props.children} {/* componente  <App /> -contiende la apliacion -*/}
+    </TaskContext.Provider>
+  );
+}
+
+    4. lo unico que estoy haciendo es pasarle el estado y las funciones.
+
+--------------------------------------------------------------
+// ** Ahora en "App" ya esta limpio quedaria de esta forma,
+pero el "App" le estaba pasando por ejemplo el "createTask"
+[<TaskForm createTask={createTask} />]
+ya no tengo que pasarselo porque ahora como la funcion
+esta arriba de todo evitar pasarselo 
+[<TaskForm />]
+
+ya el "TaskForm" puede acceder a eso.
+el "TaskList" [<TaskList tasks={tasks} deleteTask={deleteTask} />] 
+tampo necesita acceder al arreglo de tareas (tasks)
+porque "App" ya no lo tiene, ya no tiene la responsabilidad de pasarselo
+y la funcion "deleteTask" tampoco.
+
+
+ahora ya no necesita, lo eliminamos.
+(import { useState, useEffect } from "react";)
+
+[App - antes ]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+
+function App() {
+  return (
+    <>
+      <TaskForm createTask={createTask} /> {/* se envia funcion c/prop*/}
+      {/* se envia arreglo tasks */}
+      <TaskList tasks={tasks} deleteTask={deleteTask} />{" "}
+    </>
+  );
+}
+
+export default App;
+
+[App - ahora ]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+
+function App() {
+  return (
+    <>
+      <TaskForm />
+      <TaskList />
+    </>
+  );
+}
+
+export default App;
+
+** Ahora tenemos que arreglarlo porque el <TaskForm /> necesita ese valor,
+entonces 
+--------------------------------------------------------------
+
+// ** nos vamos a "TaskForm" 
+
+( function TaskForm({ createTask }) )
+y le digo ya no te estan pasando nada desde "App"
+
+asi que lo quitamos
+[function TaskForm()]
+
+y ahora el createTask tenemos que traerlo desde otro lado
+[createTask({ title, description });]
+
+entonces vamos a importar el "TaskContext"
+y voy a importar 'el nombre de TaskContext' (contexto -guarda estado tasks) 
+[import { TaskContext } from "../context/TaskContext";]
+
+y para utilizar este contexto vamos a importar desde react el useContext
+[import { useState, useContext } from "react"; ]
+
+y aqui le digo vamos a utilizar este (useContext) y quiero utilizar el 'TaskContext' que es el contexto de las tareas (tasks)
+y lo guardamos en un value como un objeto con todos valores (de TaskContext),
+[  const value = useContext(TaskContext) ]
+
+es decir va a representar este arreglo (de TaskContext).
+
+[ 
+value={{
+        tasks,
+        deleteTask,
+        createTask,
+      }}    
+]
+
+si lo vemos por consola, esto va a fallar,
+console.log(value);
+
+** nos vamos a apliacion y no aparece nada, esta en blanco.
+pero hay un error en consola.
+
+[ aparece estos 2 objetos en consola que tiene el arreglarlo (tasks):
+    y las propiedades con las funciones.
+
+Object
+    createTask: ƒ createTask(task)
+    deleteTask: ƒ deleteTask(taskId)
+    tasks: []   
+    [[Prototype]]: Object
+
+y ademas este error: 
+
+Uncaught TypeError: Cannot read properties of undefined (reading 'length')    
+]
+
+-- Esto es lo que vale (value) ahora. --
+pero yo no quiero todos esos valores
+[ const value = useContext(TaskContext) ]
+
+como es un objeto yo quiero tan solo,
+voy a estructurarlo,
+de todos esos datos tan solo quiero la funcion "createTask"
+[ const { createTask } = useContext(TaskContext); ]
+
+nota: createTask es un objeto con estas propiedades y valores,
+y solo seleccion, estruturo la funcion 'createTask'.
+
+[ objeto TaskContext
+
+value={{
+        tasks,
+        deleteTask,
+        createTask,
+      }}
+]
+
+y ya esta. 
+De esta forma le estoy diciendo de todos este objeto
+tan solo quiero el 'createTask'.
+
+y obtengo lo mismo,
+ya obtengo esta funcion de aqui
+[
+createTask({ title, description });
+]
+
+el 'createTask' al final hace mismo, se ejecuta
+solo que ahora vive aqui en (TaskContext)
+
+[ objeto TaskContext
+
+value={{
+        tasks,
+        deleteTask,
+        createTask,
+      }}
+]
+
+recibe la tarea (task)
+[ function createTask(task) {}]
+
+establece un nuevo valor en la tarea (un nuevo objeto, al objeto existente)
+[ 
+setTasks([
+      // las agrega al array de objetos
+      ...tasks, // existente, un nuevo objeto con estas propiedades/valores
+      {
+        title: task.title,
+        id: tasks.length,
+        description: task.description,
+      },
+    ]);
+  }
+]
+
+y las tareas (tasks) estan aqui
+[ const [tasks, setTasks] = useState([]) ]
+
+-- entonces al final como pueden ver ya el componente "TaskForm" esta haciendo lo mismo.
+--------------------------------------------------------------
+
+[TaskForm]
+
+import { useState, useContext } from "react";
+import { TaskContext } from "../context/TaskContext";
+
+function TaskForm() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const { createTask } = useContext(TaskContext); // estructuro y s/q fn createTask
+
+  console.log(value);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createTask({ title, description }); // enviamos objeto con estas propiedades
+    setTitle(""); // resetea a vacio los inputs despues de
+    setDescription(""); // enviar los valores de la fn createTask
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+        value={title}
+        autoFocus
+      />
+      <textarea
+        placeholder="Escribe la descripcion de la tarea"
+        onChange={(e) => {
+          setDescription(e.target.value);
+        }}
+        value={description}
+      ></textarea>
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+--------------------------------------------------------------
+// ** ahora vamos de nuevo con el "TaskList" 
+
+y "TaskList" necesita 2 parametros tasks (tareas) y la funcion de eliminar
+[ function TaskList({ tasks, deleteTask }) ]
+
+** lo mismo le digo ya no te lo estan pasando como un (prop),
+eliminamos { tasks, deleteTask }
+[ function TaskList() ]
+
+-- ahora puedes acceder directamente al contexto (TaskContext)
+[ function TaskList() ]
+
+importamos el contexto, desde react vas a traer el useContext 
+[ import { useContext } from "react"; ]
+
+y tambien importamos el TaskContext y desde alli tan solo quiero el nombre
+del contexto (TaskContext) [ es que tiene los valores, value con el objeto]
+[ import { TaskContext } from "../context/TaskContext"; ]
+
+y antes de que se ejecute todo esto,
+utiliza un contexto que seria el contexto de las tarea (TaskContext)
+y desde alli me vas a trare un objeto grande,
+que ya lo hemos visto, lo llamamos "value" por ejemplo 
+[ const value = useContext(TaskContext); ]
+
+y este "value" ya sabemos que es un objeto grande
+
+[ objeto TaskContext
+
+value={{
+        tasks,
+        deleteTask,
+        createTask,
+      }}
+]
+
+-- y yo tan solo necesito el arreglo de las tareas (tasks)
+y el "deleteTask" aqui. (se llaman asi por el objeto value de TaskContext)
+
+Entonces le digo tan el arreglo de las tareas (tasks)
+y tambien quiero la funcion (deleteTask)
+[ const {tasks, deleteTask} = useContext(TaskContext); ]
+
+Listo.
+--si vemos aqui le en "TaskList" le estoy pasando estos valores,
+le estoy pasando las tareas (tasks) y es por eso que puede recorrerlas
+[ {tasks.map((task) => ( ]
+
+y aqui le estoy pasanso el "deleteTask"
+[ <TaskCard key={task.id} task={task} deleteTask={deleteTask} /> ]
+
+** ahora en realidad yo necesito pasarle desde el "TaskList"
+al componente "TaskCard" el (deleteTask),
+probablemente no,
+porque el "TaskCard" tambien puede acceder directamente al "deleteTask"
+entonces aqui no necesito pasarle nada
+[ <TaskCard key={task.id} task={task} /> ] lo quitamos
+[ const {tasks} = useContext(TaskContext); ] aqui tambien lo quito.
+
+y quedaria de esta forma:
+
+[TaskList]
+
+import TaskCard from "./TaskCard";
+import { useContext } from "react"; // importamos contexto (TaskContext) para usar
+import { TaskContext } from "../context/TaskContext"; // importo nombre de contexto
+
+function TaskList() {
+  // ahora puedes acceder directamente al contexto (TaskContext)
+
+  const { tasks } = useContext(TaskContext); // extraigo esto del objeto de valores (value) de TaskContext para usarlo
+
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} /> // key c/elemento y envio objetos
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+** queda de esta forma y como pueden ver ya no necesito pasar el "deleteTask"
+[ <TaskCard key={task.id} task={task} /> ]
+porque como el "deleteTask" esta viviendo en el contexto (TaskContext)
+cualquiera puede accederlo 
+
+Entonces ahora vamos al "TaskCard"
+--------------------------------------------------------------
+
+// ** ahora vamos al "TaskCard" para poder acceder a "deleteTask" 
+
+[ function TaskCard({ task, deleteTask }) - original ]
+
+le digo este necesita la tarea (task) este si lo esta recibiendo como un (prop)
+en este caso esta tarea no se la puedo pasar desde contexto (TaskContext)
+porque el componente "TaskList" lo esta recorriendo (map),
+entonces es algo que el "TaskList" le esta pasando a "TaskCard".
+
+[ componente "TaskList"
+
+return (
+    <div>
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} /> // key c/elemento y envio objetos
+      ))}
+    </div>
+  );
+]
+
+** Pero en cuanto al "deleteTask" no,
+[ function TaskCard({ task }) ]
+el "deleteTask" realmente vive en el contexto (TaskContext)
+
+--- forma de utilizar el contexto en otros componentes ---
+
+**  (1) importamos para usar el contexto
+[ import { useContext } from "react"; ]
+
+** (2) importamos el contexto (TaskContext) y quiero que traigas el "TaskContext" el nombre.
+[ import { TaskContext } from "../context/TaskContext";  ]
+
+
+** (3) entonces antes de que retonorne este elemento,
+le digo vas a utilizar un contexto que seria el (TaskContext)
+y esto nuevamente trae un nuevo objeto con todos los valores,
+pero yo no quiero todos yo tan solo quiero,
+en este caso necesito la funcion "deleteTask"
+[ const { deleteTask } = useContext(TaskContext); ]
+
+--------------------------------------------------------------
+[TaskCard]
+
+import { useContext } from "react"; // para poder usar contexto (TaskContext)
+import { TaskContext } from "../context/TaskContext"; // importo nombre contexto
+
+function TaskCard({ task }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  // uso el contexto (TaskContext) y estructuro,s/traigo fn deletTask del objeto (value)
+  const { deleteTask } = useContext(TaskContext);
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+
+*** Guardo y si vengo a a la apliacion 
+ya me sale la apliacion/pagina normal
+y en consola ya no tengo errores.
+(quite el console.log(value) en TaskForm)
+
+** si yo quiero eliminar se elimina,
+si yo quiero crear (Guardar)
+se crean las tareas en las paginas.
+
+Funciona bien.
+
+Nota: de esta forma funciona,
+no necesito realmente pasarle de un (prop) a otro (prop).
+
+De hecho si luego creo un componente dentro de este componente
+"TaskCard" igual puedo utilizar el contexto (TaskContext)
+y puedo llamarlo el contexto posea.
+
+Entonces de esta forma ya me olvido de saber si estoy en un componente dentro de otro,
+cuando quiero acceder a una funcion que se que voy a utilizar mucho,
+y ya esta. 
+
+
+-------------------------------------------------------------
+        codigo final - funciona sin errores --
+
+[TaskForm]
+
+import { useState, useContext } from "react"; // p/usar contexto
+import { TaskContext } from "../context/TaskContext"; // importo contexto
+
+function TaskForm() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  // uso contexto y estructuro y solo quiero fn createTask
+  const { createTask } = useContext(TaskContext);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createTask({ title, description }); // enviamos objeto con estas propiedades
+    setTitle(""); // resetea a vacio los inputs despues de
+    setDescription(""); // enviar los valores de la fn createTask
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+        value={title}
+        autoFocus
+      />
+      <textarea
+        placeholder="Escribe la descripcion de la tarea"
+        onChange={(e) => {
+          setDescription(e.target.value);
+        }}
+        value={description}
+      ></textarea>
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+
+[TaskContext]
+
+// "API Context" da contexto de todos los componentes, se comparte. Principal
+import { createContext, useState, useEffect } from "react"; // importamos useState p/funcione
+import { tasks as data } from "../data/tasks"; // archivo de datos (tasks)
+
+export const TaskContext = createContext(); // nombre del contexto
+
+export function TaskContextProvider(props) {
+  // componente q engloba a todo
+  const [tasks, setTasks] = useState([]); // nuevo array tasks vacio (contexto -task-)
+
+  function createTask(task) {
+    // recibe objeto c/propiedades
+    setTasks([
+      // las agrega al array de objetos
+      ...tasks, // existente, un nuevo objeto con estas propiedades/valores
+      {
+        title: task.title,
+        id: tasks.length,
+        description: task.description,
+      },
+    ]);
+  }
+
+  function deleteTask(taskId) {
+    setTasks(tasks.filter((task) => task.id !== taskId)); // true se queda
+  }
+
+  useEffect(() => {
+    setTasks(data); // se llena el array con los datos del array original
+  }, []); // solo se ejecuta una vez c/carga el componente
+
+  return (
+    // *creamos ese componente global -contexto naranja- y le pasamos la propiedad value c/propiedades y valores del objeto -variables y funciones  a compartir*
+    <TaskContext.Provider
+      value={{
+        tasks,
+        deleteTask,
+        createTask,
+      }}
+    >
+      {props.children} {/* componente  <App /> -contiende la apliacion -*/}
+    </TaskContext.Provider>
+  );
+}
+
+
+[TaskCard]
+
+import { useContext } from "react"; // para poder usar contexto (TaskContext)
+import { TaskContext } from "../context/TaskContext"; // importo nombre contexto
+
+function TaskCard({ task }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  // uso el contexto (TaskContext) y estructuro,s/traigo fn deletTask del objeto (value)
+  const { deleteTask } = useContext(TaskContext);
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+
+[TaskList]
+
+import TaskCard from "./TaskCard";
+import { useContext } from "react"; // importamos contexto (TaskContext) para usar
+import { TaskContext } from "../context/TaskContext"; // importo nombre de contexto
+
+function TaskList() {
+  // ahora puedes acceder directamente al contexto (TaskContext)
+
+  // uso contexto y extraigo s/tasks del objeto de valores (value) de TaskContext
+  const { tasks } = useContext(TaskContext); 
+
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} /> // key c/elemento y envio objetos
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+[App]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+
+function App() {
+  return (
+    <>
+      <TaskForm />
+      <TaskList />
+    </>
+  );
+}
+
+export default App;
+
+
+[main]
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+import { TaskContextProvider } from "./context/TaskContext"; // componente global
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <TaskContextProvider>   
+      <App />
+    </TaskContextProvider>
+  </React.StrictMode>
+);
+
+
+
+
+--------------------------------------------------------------
+
+
+
+
+
+    
+
+

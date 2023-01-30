@@ -1,0 +1,1131 @@
+crear Contexto
+
+Vamos a mejorar el codigo que hemos escrito hasta ahora,
+si analizamos el grafico hasta este momento,
+
+estamos haciendo un codigo que tal vez nos este dando un poco de problemas
+y quiza sea dificil de entender al inicio y son estas funciones que hemos creado
+en el componente "App" (createTask, deleteTask).
+
+si recuerdan cuando tengo que crear algo tengo que pasar la funcion 'createTask' desde "App" a "TaskForm" y lo mismo con el 'deleteTask', desde "App" pasa la funcion a "TaskList" y como el no lo usa lo tiene que pasar a 'TaskCard'.
+
+Ahora que pasa, si yo le digo uno de estos 'TaskCard', 
+por ejemplo no tan solo tiene valores sino que este boton (Eliminar tarea) que estaba a dentro tambien es su propio componente, 
+
+entoces por darle una idea vamos a mover estos 'TaskCard' de esta forma. 
+
+entonces supongamos que yo quiero Eliminar (deleteTask),
+le digo desde "App" le pasas a 'TaskList' y 'TaskList' le pasa a cada uno de estos componentes ('TaskCard')
+
+pero yo digo las tarjetas yo qiero mejorarlas un poco y voy 
+a crear un componente dentro de cada una de estas tarjetas ('TaskCard') que va a tener un boton,
+entonces creo otro componente, supongamos un boton (button)
+
+entonces al final voy a crear un boton que va a tener otro color y va hacer otro componente,
+y el que lo va a ejecutar al final es el boton,
+
+-- entonces tengo que pasarle desde "App" el 'deleteTask' al 'TaskList' (porque no lo usa) y luego a 'TaskCard' y luego al boton 'button' o cualquier otra interfaz, esto es un solo ejemplo. --
+
+pero si se dan cuentan ya estamos teniendo bastantes problemas porque tengo que tengo que pasarle desde 
+    el 'deleteTask' al 'TaskList' (porque no lo usa) 
+    y luego a 'TaskCard' 
+    y luego al boton 'button' o cualquier otra interfaz.
+
+-- Entonces si creamos una interfaz compleja, imagensen un interfaz con cientos de componentes uno dentro de otro,
+eso es inmantenible, 
+
+de hecho a este concepto de pasar un (prop) dentro de otro se conoce como "prop drilling" y basicamente es como decir 
+te estoy pasando una funcion, tu tienes que utilizarla,
+se la pasas a su hijo, se la pasas a su hijo y asi.
+
+Ahora si yo modifico una, tengo que modificar en todas las que estan descendiendo.
+
+-- el problema viene justamente porque nosotros tenemos 
+un componente que es dueno del estado (App)
+si no nosotros pensamos la razon por la que estamos creando esta funcion (deleteTask) es por que "App" es el que contiene
+el estado (el arreglo tasks),
+
+-- justamente necesito funciones que me permitan interactuar con este estado (App - arreglo task)
+y como es el dueno del estado tengo que pasarle que pasarle las funciones a (TaskList, TaskCard, button) para poder compartir una especie de funcionalidad que pueda alterar el estado (App - arreglo task)
+
+-- Entonces una mejor forma seria si todos los componentes en lugar de estar esperando a que le pasen un valor en este caso todos los componentes (App - deleteTask, createTask),
+
+en este caso todos los componentes esperan que (App - deleteTask) pasen primero a 'TaskList' y luego a 'TaskCard' y asi.
+
+-- pues yo podria cambiarlo cambiar la flecha y poder decir 
+y porque mejor no hacemos que 'TaskCard' siempre acceda a un estado, entonces si esta requiere de algo va directamente al estado (App - arreglo task) 
+
+o si el 'TaskList' requiere de un estado directamente va directamente al estado (App - arreglo task)
+
+y lo mismo con con el 'TaskForm' si realmente requiere de algo lo va a importar (App - arreglo task),
+
+        
+        ********* SOLUCION  *********
+
+entonces porque no cambiamos esa flecha. 
+
+-- para poder hacer eso lo que podriamos hacer es que este "App" de aqui (App - arreglo task) le digo este no va a poseer el estado (tasks) 
+
+si no  lo que vamos hacer es crear otro componente que vamos a crear de todo (color naranja), y esta sobresalido para que entiendan que todos los componentes al final estan dentro de este componente (naranja), 
+ 
+y a este componente (naranja) lo que vamos hacer es que el va a contener el componente "App" ahora. 
+
+lo hacemos asi porque ahora este componente "App" (azul - maneja TaskForm, TaskList, TaskCard, button)
+
+Ahora el contexto (naranja) va a manejar el estado (tasks)
+ya no el "App".
+
+-- ahora esto no parece muy distinto porque es un componente "Contexto" (naranja) que esta por encima de (App azul),
+entonces vas a tenerle que pasar desde 
+"Context" (naranja) a "App" (App) luego a "TaskForm" luego a "TaskList" y asi... 
+
+-- ** Lo cierto que es React ha pensado en esto
+y al tener este componente "Contexto" (naranja)
+React nos da una nueva forma de traer datos es justamente diciendonos ahora desde 
+    "TaskCard" puedes acceder directamente a este componente "Contexto",
+
+    desde "TaskList" puedes acceder directamente a este componente "Contexto"
+
+    desde "TaskForm" puedes acceder directamente a este componente "Contexto"
+
+porque, porque todos estan dentro de este componente grande "Contexto" (naranja), pues ahora todos pueden acceder a los datos, 
+
+esto es un mejor forma de poder compartir es un estado con todos los componentes. ** --
+
+Esto es lo que vamos a estar haciendo para poder actualizar nuestro codigo.
+
+// ** me voy al componente "App" que es el que contiene el estado (arreglo tasks) y se le esta asignando el valor y aqui esta creando las funciones (deleteTask, createTask)
+
+todo este codigo es lo que interactua con el estado,
+todo esto es el estado que tenemos aqui en el grafico (componente Contexto [naranja] - con las funciones deleteTask, createTask)
+
+[
+  const [tasks, setTasks] = useState([]); // nuevo array tasks vacio
+
+  useEffect(() => {
+    setTasks(data); // se llena el array con los datos del array original
+  }, []); // solo se ejecuta una vez c/carga el componente
+
+  function createTask(task) {
+    // recibe objeto c/propiedades
+    setTasks([
+      // las agrega al array de objetos
+      ...tasks, // existente en un nuevo objeto
+      {
+        title: task.title,
+        id: tasks.length,
+        description: task.description,
+      },
+    ]);
+  }
+
+  function deleteTask(taskId) {
+    setTasks(tasks.filter((task) => task.id !== taskId)); // true se queda
+  }
+
+]
+
+// ** Lo primero que hacemos es crear este componente "Contexto"
+eso React lo llama "API Context" y justamente sirve para eso para darle un contexto de todos los componentes,
+
+y eso se crea a partir de una carpeta para tener mas orden,
+creamos una carpeta "/src/context", y dentro creamos un componente que en nuestro caso va a contener tareas vamos a llamarlo "TaskContext.jsx", pueden llamarlo de cualquier otra forma. 
+
+y va a contener la extension (.jsx)
+y dentro vamos a colocar una funcion sencilla,
+solo que esta funcion no va a retornar un (div),
+sino va a retornar un elemento que nos va permitir 
+englobar al resto.
+
+// ** por ahora voy a colocar un fragment (<>) y aqui le voy a decir que van ir elementos hijos.
+
+Nota: Esto no he explicado, en react cuando nosotros por ejemplo
+de decimos que dentro de un componente (TaskContent) van a ir mas componentes
+podemos decirle como elementos hijos,
+hay una propiedad especial que se llama "children",
+es decir ustedes crean un componente (TaskContent)
+y ya saben que van a recibir (props) [TaskContent(props)],
+pero de estos (props) yo le puedo decir que desde todas sus propiedades
+hay una especial llamada "children" ({props.children}),
+ese "children" es como decir aqui van a ir mas componentes.
+
+Para darles una idea le digo en ese TaskContent(props)
+van a ir fragment (<>) y coloco un h1 (componente context),
+ahora si quiero colocar un h1 arriba de otros componentes 
+simplemente, voy a reutizar este contexto (TaskContext)
+
+
+[       "TaskContent"
+
+function TaskContext(props) {
+  return (
+    <>
+      <h1>Componente Context</h1>
+      {props.children} 
+    </>
+  );
+}
+
+export default TaskContext;
+
+]
+
+** Entonces yo vengo a [TaskCard] por ejemplo y supongamos que quiero utilizar este contexto (TaskContext),
+
+importo en TaskCard subimos un nivel y entramos en la carpeta 'context'
+y trae "TaskContext" y desde alli traemos "TaskContext"
+
+si yo quiero colo colocar todos estos valores dentro de "TaskContext"
+y como "TaskContext" espera un elemento hijo ({props.children}) o elementos hijos
+que por eso se llama "children".
+
+[   "TaskCard"
+
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+]
+
+
+** todo este <div> va a estar dentro del "TaskContext"
+
+[   "TaskCard"
+
+return (
+    <TaskContext>
+      <div>
+        <h1>{task.title}</h1>
+        <p>{task.description}</p>
+        <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+      </div>
+    </TaskContext>
+  );    
+]
+
+y al final todos elementos que habia creado estan dento de ese "TaskContext",
+esto significa que toda esta porcion de codigo al final va a estar en este lugar
+({props.children}) 
+
+y al final se va a generar esto, arriba del <div> va a estar un <h1> 
+
+
+[ "TaskContext" (sustiyendo por div de "TaskCard" al {props.children} )
+
+function TaskContext(props) {
+  return (
+    <>
+      <h1>Componente Context</h1>
+      <div>
+        <h1>{task.title}</h1>
+        <p>{task.description}</p>
+        <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+      </div>
+    </>
+  );
+}
+
+export default TaskContext;
+]
+
+
+y finalmente la forma correcta en queda esto es:
+
+[   "TaskContext" final ({props.children} toma el div del "TaskCard")
+
+// "API Context" da contexto de todos los componentes, se comparte. Principal
+
+function TaskContext(props) {
+  return (
+    <>
+      <h1>Componente Context</h1>
+      {props.children}      --> aqui el <div> de "TaskCard"
+    </>
+  );
+}
+
+export default TaskContext;
+]
+
+** con estos cambios voy al navegador/aplicacion
+si creo una tarea, arriba me aparece: Componente Context (h1)
+
+Componente Context      (h1)
+primer tarea            (div)
+primera descripcion
+
+Eliminar tarea
+
+Escribe tu tarea (input) Escribe la descripcion de la tarea (textarea) Guardar (boton)
+
+** incluso si nos vamos a al consola - components 
+pueden ver que aparece "TaskCard" y dentro de el hay un componente mas que se llama "TaskContext",
+
+porque justamente le digo dentro del componente "TaskCard" 
+hay un "TaskContext" y luego le colocas todos los elementos (div). 
+
+
+** si yo creo mas tareas pueden ver que todas aparecen con ese componente "TaskContext -h1" porque los esta englobando
+
+Componente Context      ---> h1 (TaskContext - contenedor global)
+primer tarea            ---> div (TaskCard) [elementos hijos]
+primera descripcion
+Eliminar tarea
+
+Componente Context
+segunda tarea
+segunda descripcion
+Eliminar tarea
+
+Componente Context
+tercera tarea
+tercera descripcion
+Eliminar tarea
+
+Escribe tu tarea (input) Escribe la descripcion de la tarea (textarea) Guardar (boton)
+
+Nota: cada vez que recargo se vuelve a cargar los 3 objetos del arreglo (tasks)
+aunque los elimine y esto pasa porque es un archivo con ese arreglo (tasks.js) que esta leyendo directamente y lo afecta al momento de eliminar una tarea, a diferencia si fuera una base de datos. por eso al recargar vuelve a mostar esos 3 elementos.
+
+
+** De esta forma le explico basicamente que nosotros podemos colocar elementos dentro de otro mas grande (TaskContext),
+entonces lo llamaria componente padre (TaskContext)
+y los componentes hijo (TaskCard),
+y es por eso que se llama children en este caso ({props.children})
+
+
+[ "TaskCard"
+
+import TaskContext from "../context/TaskContext"; // impor Contexto p/reutilizarlo
+
+function TaskCard({ task, deleteTask }) {
+  
+  return (
+    <TaskContext>               --> elemento padre (TaskContext)
+      <div>                     --> elemento hijo(s) (TaskCard)
+        <h1>{task.title}</h1>
+        <p>{task.description}</p>
+        <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+      </div>
+    </TaskContext>
+  );
+}
+
+export default TaskCard;
+
+]
+ **
+
+-- pero lo quitamos porque era tan solo un ejemplo.
+
+y quedaria el "TaskCard" como estaba ya sin el import de TaskContext.
+
+[ "TaskCard" original
+
+function TaskCard({ task, deleteTask }) {
+
+  return (
+      <div>
+        <h1>{task.title}</h1>
+        <p>{task.description}</p>
+        <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+      </div>
+  );
+}
+
+export default TaskCard;
+]
+
+** si regreso al navegador/aplicacion y agrego tareas
+
+1
+1
+Eliminar tarea
+
+2
+2
+Eliminar tarea
+
+Escribe tu tarea (input) Escribe la descripcion de la tarea (textarea) Guardar (boton)
+
+** ya me aparece normal como estaba originalmente,
+ya sin el (h1) del componente "TaskContext".
+
+------------------------------------------------------------------------------
+// ** y porque estoy creando eso es porque justama
+ quiero eso, recuerdan que hibamos a crear un componete grande que iba a contern a todos.
+
+ -- voy  a crear un componente especial que me da React,
+
+ lo primero es importar desde react un funcion que me da llamada "createContext" [ import { createContext } from "react"; ]
+
+ y esta funcion la tengo que ejecutar 
+ y esta funcion lo que va hacer es retornarme un "objeto" 
+ y este objeto lo guardo en una constante llamada "TaskContent" en mayuscula.
+
+ y este "TaskContent" (constante) por ahora hay que interpretarlo como el nombre del "contexto" (contenedor global - naranja)
+ [const TaskContext = createContext();]
+
+ ahora me falta crear el contenedor aqui en la funcion 
+ [function TaskContext(props)]
+ voy a decirle voy a retornar un componente
+ y de hecho este componente naranja tiene un nombre especifico,
+ es decir el (TaskContent) lo que hace es colocar un nombre a este componente (contenedor naranja), 
+ 
+ pero este componente en si se llama "provider" porque justamente  
+ "provee de un estado al resto".
+
+ Entonces para diferenciarlo lo que me dice react, 
+ este es el nombre del contexto (const TaskContext = createContext();)
+
+ pero la etiqueta (nombre de la funcion) la vamos a llamar TaskContentProvider [ function TaskContextProvider(props) { ...} ]
+
+ --- en otras palabras:
+      esto es lo que almacena los datos 
+      [ const TaskContext = createContext(); ]  ( -- nombre del contexto )
+
+      pero este es el componente que engloba al resto de componentes
+      (TaskContextProvider)
+      [ function TaskContextProvider(props) { ...} ] (-- componente q 
+                                                      engloba a todo)
+
+      y que le voy a decir desde TaskContext voy a estar creando un "provider"
+
+      <TaskContext.Provider> (const TaskContext)    (-- aqui creamos ese 
+                                                    componente [contexto])
+      y a dentro voy a colocarle ({props.children})
+
+      -- con esto ya tengo justamente este componente naranja (TaskContext),
+      ya puedo empezar a utilizarlo.
+
+-----------------------------------------------------------------
+[TaskContext]
+
+// "API Context" da contexto de todos los componentes, se comparte. Principal
+import { createContext } from "react";
+
+const TaskContext = createContext();      // nombre del contexto
+
+function TaskContextProvider(props) {     // componente q engloba a todo
+  return (
+    <>
+      <TaskContext.Provider>              {/*creamos ese componente -contexto-*/}
+        {props.children}
+      </TaskContext.Provider>
+    </>
+  );
+}
+
+export default TaskContext;
+-----------------------------------------------------------------
+
+// ** Para utilizarlo en lugar de exportarlo por defecto,
+voy a decir lo siguiente,
+
+
+voy a exportar el TaskContext (export const TaskContext = createContext();)
+y tambien voy a exportar individuamente el TaskContentProvider
+(export function TaskContextProvider(props) {...})
+
+** para poder saber que es lo que estamos importando al momento de llamar a este "contexto"
+
+[ TaskContext]
+
+// "API Context" da contexto de todos los componentes, se comparte. Principal
+import { createContext } from "react";
+
+export const TaskContext = createContext(); // nombre del contexto
+
+export function TaskContextProvider(props) {
+  // componente q engloba a todo
+  return (
+      <TaskContext.Provider>
+        {/*creamos ese componente -contexto naranja-*/}
+        {props.children}
+      </TaskContext.Provider>
+  );
+}
+-----------------------------------------------------------------
+
+// ** como ya esta listo en TaskContext, 
+vamos a venir a donde lo va englobar a todo,
+nos vamos al "main.jsx",
+y justo en <App /> donde esta el componente 
+vamos a decirle que "todo va estar dentro de ese contexto",
+importamos TaskContext y desde alli voy a traer tan solo 2 valores,
+puedo traer el TaskContext y TaskContentProvider 
+
+-- TaskContentProvider es que renderiza un componente jsx 
+
+-- voy a colocar TaskContent.Provider y adentro le paso <App />
+
+-----------------------------------------------------------------
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+import { TaskContextProvider } from "./context/TaskContext";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <TaskContextProvider>
+      <App />
+    </TaskContextProvider>
+  </React.StrictMode>
+);
+ 
+** si guardo esto y vengo a la aplicacion/pagina
+y refresco (me aparecen las 3 tareas),
+y pueden ver en consola - Components 
+que toda la aplicacion 
+esta dentro de un "TaskContentProvider" 
+  luego "Context.Provider"
+    luego "App" 
+      luego "TaskForm"
+      luego "TaskList"
+        luego "TaskCard"
+        luego "TaskCard"
+        luego "TaskCard"
+        luego "TaskCard"
+
+-- si se dan cuenta esto al final ha creado 2 ("TaskContentProvider" y "Context.Provider") pero considerenlo uno por ahora, no hay ningun problema,
+
+si nosotros analizamos esta estructura esta igual justamente 
+como el grafico que tenemos. 
+
+-- Entonces ya tenemos un componente que los engloba todo.
+
+-- Toda esta funcionalidad (main.jsx) es para que nosotros 
+ahora desde el "TaskContent",
+
+tan solo para dar un ejemplo, nosotros podemos acceder a algo,
+voy a decirle que el "TaskContent" por ahora no tiene el arrego (tasks),
+lo tiene "App", 
+
+pero le voy a decir que mi "TaskContent" va a tener una variable
+que se va a llamar x=20.
+
+supongamos que los componentes de aqui requieren este valor,
+entonces lo que vamos hacer es que 
+"TaskForm" va a poder pedir este valor (x=20),
+"TaskList va a poder pedir este valor (x=20),
+"TaskCard" va a poder pedir este valor (x=20),
+"button" tambien va a poder pedir este valor (x=20),
+todos los elementos van a poder llamr este valor (x=20) a "TaskContext".
+
+// ** para poder hacer esto de pedir valor a "TaskContext" 
+nos vamos al componente "TaskContext" y voy a crear una variable
+que se va a llamar x=2.
+
+y esta variable va a poder ser accedida o va a poder ser solicitada,
+pero tenemos que Guardarla dentro del componente que los contiene a todos 
+(<TaskContext.Provider>),
+voy a llamar su propiedad "value" y le digo vas a almacenar (x)
+[<TaskContext.Provider value={x}>]
+-----------------------------------------------------------------
+
+[TaskContext]
+
+// "API Context" da contexto de todos los componentes, se comparte. Principal
+import { createContext } from "react";
+
+export const TaskContext = createContext();   // nombre del contexto
+
+export function TaskContextProvider(props) {  // componente q engloba a todo
+  let x = 20;                                 // variable que va poder ser accedida
+
+  return (
+      <TaskContext.Provider value={x}> {/*creamos ese componente global -contexto naranja- y le pasamos la propiedad value con el valor de la variable*/}
+        {props.children}     {/* componente  <App /> -contiende la apliacion -*/}
+      </TaskContext.Provider>
+  );
+}
+
+y listo, si yo guardo aqui 
+-----------------------------------------------------------------
+// ** y me voy a "TaskCard" (que esta dentro de TaskList y dento de App)
+si vengo a "TaskCard" y quiero llamar a ese valor x = (20)
+
+para hacerlo, importamos react,
+y asi como teniamos el "createContext" para crear este contexto de aqui (TaskContext), pues voy a tener tambien una funcion llamada 'useContext' 
+que es para utilizar ese contexto. 
+[ import { useContext } from "react"; ]
+
+Entonces le digo ok, quiero utilizar ese contexo, y lo ejecuto, 
+pero no se que contexto puedo llamar,
+de hecho lo que podemos hacer en react es que podemos varios de estos contextos, es decir puedo crear otros contextos (contenedores naranjas)
+luego yo tengo que decidir de cual de estos quiero llamar,
+en este caso tengo que darle el nombre,
+es por eso que le hemos colocado un nombre al contexto (TaskContent)
+
+Entonces para traer ese contexto (TaskContent) ya lo tenemos aqui 
+y justamente es este, TaskContext [  const TaskContext = createContext(); ]
+Este es el nombre del contexto (TaskContext)
+
+entonces en [TaskCard] voy a importar eso, tan solo quiero el nombre del contexto, ya no el (TaskContentProvider) porque este es el componente. 
+[ import { TaskContext  } from "../context/TaskContext"; ]
+
+y listo esto es el quiero utilizar 
+[ useContext(TaskContext) ] y ya esta. 
+con esto con esta linea de codigo de aqui,
+
+le estoy diciendo desde "TaskCard" en donde estoy, 
+ya tengo acceso al contexto (TaskContext)
+y entonces puedo traer este valor (x=20)
+
+Entonces le digo, vamos a extraer de esto [ useContext(TaskContext) ]
+el valor que tenga (const valor = useContext(TaskContext);) 
+y quiero mostrar el valor por consola 
+
+-----------------------------------------------------------------
+[TaskCard]
+
+import { useContext } from "react"; // p/utilizar ese contexto
+import { TaskContext } from "../context/TaskContext"; // imp s/n d contexto (var)
+
+function TaskCard({ task, deleteTask }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  const valor = useContext(TaskContext); // llamo/utilizo el contexto y extraigo
+  console.log(valor);
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+** y si voy a la aplicacio y vengo en consolay refresco
+me aparece 20, 20, 20.
+La razon es que hay 3 componentes,
+(20) --> tambien se muestra 3 veces 
+
+y es porque justamente es que aqui al inicio en el [main.jsx]
+le dije que este se iba a ejecutar dentro de un [ <React.StrictMode> ]
+
+y esto lo ejecuta otra vez y es por eso que vemos doble (20, 6 veces ) 
+pero no hay ningun problema, esto es tan solo un desarrollo. 
+
+[
+20
+(20)
+20
+(20)
+20  --> que es el valor 
+(20) --> tambien se muestra 
+]
+
+** Ahora si se dan cuenta, "TaskCard" no tiene ninguna variable por ningun lado,
+esto yo esta trayendo desde este archivo (TaskContent.jsx),
+esta es idea para decirle de otra forma que aqui nosotros vamos 
+a almacenar todo nuesto estado [ let x = 20; ]
+
+[ "TaskContente"
+
+export function TaskContextProvider(props) {  // componente q engloba a todo
+  let x = 20;                                 // variable/estado q sera accedida
+
+  return (
+      <TaskContext.Provider value={x}> {/*creamos ese componente global -contexto naranja- y le pasamos la propiedad value c/el valor d variable a compartir*/}
+        {props.children}     {/* componente  <App /> -contiende la apliacion -*/}
+      </TaskContext.Provider>
+  );
+]
+
+y de esta forma ya nos olvidamos si un componente esta dentro de otro. 
+ya no importa, si luego creo por ejemplo creo otros componentes que no tiene 
+nada que ver con los anteriores,
+ni si quiera estan en el arbol de componentes (cuadros naranjas fuera del Principal) 
+Tambien puede acceder al contexto (TaskContext) siempre y cuando esten adentro los componentes  del cuadro naranja.
+
+Van a poder seguir accediendo al contexto porque estan dentro del contexto (TaskContext - contenedor naranja principal) es asi de simple.
+
+-----------------------------------------------------------------
+
+// ** para dar otro ejemplo, similar a esto,
+supongamos que estoy en el "TaskForm" y este no esta dento de "TaskList",
+sino al mismo nivel, pero como esta dentro del contexto (TaskContext),
+tambien puede ser el valor 20.
+
+importamos el contexto, y tan solo quiero el nombre 
+[ import { TaskContext } from "../context/TaskContext"; ]
+y luego le digo que desde react tambien voy a importar el "useContext"
+[ import { useState, useContext } from "react"; ]
+
+Entonces ya tengo el que me va permitir utilizar el contexto (useContext)
+y el contexto que voy a usar (TaskContext)
+
+entonces lo utilizo, 
+le digo useContext te paso el nombre del contexto (TaskContext)
+[ useContext(TaskContext); ] y con esto ya tengo el valor (x=20)
+
+entonces le digo quiero acceder a los valores de este contexto 
+[ const valor = useContext(TaskContext); ]
+y le digo muestrame por consola el valor. 
+[ console.log(valor); ]
+
+** si guardo y refresco en consola,
+me aparecen 5 veces (20) con 5 veces (20) repetidos debajo (por el <React.StrictMode>),
+
+y aparecen 5 veces y es porque el "TaskCard" lo esta utilizando tambien.
+
+-- pero vamos a quitarlo de [TaskCard] ya no los vamos a utilizar por ahora
+[
+import { useContext } from "react"; // p/utilizar ese contexto
+import { TaskContext } from "../context/TaskContext"; // imp s/n d contexto (var)
+
+const valor = useContext(TaskContext); // utilizo el contexto y extraigo (x=20)
+console.log(valor);
+
+---------
+import { useContext } from "react"; // p/utilizar ese contexto
+import { TaskContext } from "../context/TaskContext"; // imp s/n d contexto (var)
+
+function TaskCard({ task, deleteTask }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  const valor = useContext(TaskContext); // utilizo el contexto y extraigo (x=20)
+  console.log(valor);
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+]
+
+-- los eliminamos,
+guardamos y si refrescamos podemos ver que ahora aparece 2 (20)
+con 2 (20) repetidos, total 4.
+
+ahora aparece 2 veces 20, porque cuando nosotros cargamos la apliacion
+que recuerdan que la lista de tareas (tasks.js)
+esta actualizando este valor, 
+es decir esta colocando los datos (las tareas)
+entonces cuando le coloca los datos toda la aplicacion 
+se vuelve a renderizar.
+
+** entonces por darle una idea, 
+si en "App" comento este useEffect y guardo.
+
+[
+useEffect(() => {
+  //   setTasks(data); // se llena el array con los datos del array original
+  // }, []); // solo se ejecuta una vez c/carga el componente
+]
+
+** recargo la aplicacion pueden ver que ahora
+solo me aparece 1 vez 20 con su copia. 
+
+y solo en la pagina:
+
+No hay tareas aun
+Escribe tu tarea (input) Escribe la descripcion de la tarea (textarea) Guardar (boton)
+
+** bueno ese no es el punto. 
+
+El punto es que ya estoy accediendo al valor desde el "TaskForm".
+Entonces estoy haciendo basicamente esto,
+desde "TaskForm" estoy yendo directamente al valor (x=20 de TaskContext)
+
+y simplemente utilizando cada rato esta sintaxis
+
+[ "TaskForm" ]
+
+import { useState, useContext } from "react"; // importo p/usar contexto
+import { TaskContext } from "../context/TaskContext"; // nombre d contexto a usar
+
+  const valor = useContext(TaskContext); // accedo a los valores de este contexto
+  console.log(valor);
+]
+
+y de esta forma ya tenemos un contexto (TaskContext)
+
+en la siguiente seccion vamos a empezar a utilizarlo,
+
+quitamos de "TaskForm" y lo dejamos limpio.
+
+[  {useContext}
+  import { TaskContext } from "../context/TaskContext"; // nombre d contexto a usar
+
+const valor = useContext(TaskContext); // accedo a los valores de este contexto
+  console.log(valor);  
+]
+
+-----------------------------------------------------------------
+[main.jsx - original]
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+
+
+-----------------------------------------------------------------
+codigo final usando ejemplo de TaskContent y usando useContext en TaskForm
+
+[TaskForm]
+
+import { useState, useContext } from "react"; // importo p/usar contexto
+import { TaskContext } from "../context/TaskContext"; // nombre d contexto a usar
+
+function TaskForm({ createTask }) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  const valor = useContext(TaskContext); // llamo a la funcion accedo a los valores de este contexto
+  console.log(valor);   // (x=20)
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createTask({ title, description }); // enviamos objeto con estas propiedades
+    setTitle(""); // resetea a vacio los inputs despues de
+    setDescription(""); // enviar los valores de la fn createTask
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+        value={title}
+        autoFocus
+      />
+      <textarea
+        placeholder="Escribe la descripcion de la tarea"
+        onChange={(e) => {
+          setDescription(e.target.value);
+        }}
+        value={description}
+      ></textarea>
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+-----------------------------------------------------------------
+[main]
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+import { TaskContextProvider } from "./context/TaskContext"; // componente global
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <TaskContextProvider>   
+      <App />
+    </TaskContextProvider>
+  </React.StrictMode>
+);
+-----------------------------------------------------------------
+[TaskContext]
+
+// "API Context" da contexto de todos los componentes, se comparte. Principal
+import { createContext } from "react";
+
+export const TaskContext = createContext();   // nombre del contexto
+
+export function TaskContextProvider(props) {  // componente q engloba a todo
+  let x = 20;                                 // variable/estado q sera accedida
+
+  return (
+      <TaskContext.Provider value={x}> {/*creamos ese componente global -contexto naranja- y le pasamos la propiedad value c/el valor d variable a compartir*/}
+        {props.children}     {/* componente  <App /> -contiende la apliacion -*/}
+      </TaskContext.Provider>
+  );
+}
+-----------------------------------------------------------------
+[TaskCard]
+
+function TaskCard({ task, deleteTask }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+-----------------------------------------------------------------
+[TaskList]
+
+import TaskCard from "./TaskCard";
+
+function TaskList({ tasks, deleteTask }) {
+  // recibe el array de objetos tasks
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} deleteTask={deleteTask} /> // key c/elemento y envio objetos
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+-----------------------------------------------------------------
+[App]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+import { tasks as data } from "./data/tasks";
+import { useState, useEffect } from "react";
+
+function App() {
+  const [tasks, setTasks] = useState([]); // nuevo array tasks vacio
+
+  useEffect(() => {
+    setTasks(data); // se llena el array con los datos del array original
+  }, []); // solo se ejecuta una vez c/carga el componente
+
+  function createTask(task) {
+    // recibe objeto c/propiedades
+    setTasks([
+      // las agrega al array de objetos
+      ...tasks, // existente en un nuevo objeto
+      {
+        title: task.title,
+        id: tasks.length,
+        description: task.description,
+      },
+    ]);
+  }
+
+  function deleteTask(taskId) {
+    setTasks(tasks.filter((task) => task.id !== taskId)); // true se queda
+  }
+
+  return (
+    <div>
+      <TaskList tasks={tasks} deleteTask={deleteTask} />{" "}
+      {/* se envia arreglo tasks */}
+      <TaskForm createTask={createTask} /> {/* se envia funcion */}
+    </div>
+  );
+}
+
+export default App;
+
+
+** aplicacion
+
+consola 2 (20) (TaskForm)
+y 2 (20) copias (<TaskContextProvider>)
+
+[
+20
+20
+20
+20  
+]
+
+mi primer tarea
+mi primer tarea
+
+Eliminar tarea
+mi segunda tarea
+mi segunda tarea
+
+Eliminar tarea
+mi tercer tarea
+mi tercer tarea
+
+Eliminar tarea
+
+Escribe tu tarea (input) Escribe la descripcion de la tarea (textarea) Guardar (boton)
+-----------------------------------------------------------------
+
+NOta: dejamos la aplicacion como estaba (limpio) TaskForm
+
+de hecho hasta este  momento tenemos este "TaskContext", luego los vamos a modificar, pero con esto ya estaria.
+
+
+[TaskForm]
+
+import { useState } from "react"; 
+
+function TaskForm({ createTask }) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createTask({ title, description }); // enviamos objeto con estas propiedades
+    setTitle(""); // resetea a vacio los inputs despues de
+    setDescription(""); // enviar los valores de la fn createTask
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        placeholder="Escribe tu tarea"
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+        value={title}
+        autoFocus
+      />
+      <textarea
+        placeholder="Escribe la descripcion de la tarea"
+        onChange={(e) => {
+          setDescription(e.target.value);
+        }}
+        value={description}
+      ></textarea>
+      <button>Guardar</button>
+    </form>
+  );
+}
+
+export default TaskForm;
+
+
+[TaskContext]
+
+// "API Context" da contexto de todos los componentes, se comparte. Principal
+import { createContext } from "react";
+
+export const TaskContext = createContext();   // nombre del contexto
+
+export function TaskContextProvider(props) {  // componente q engloba a todo
+  let x = 20;                                 // variable/estado q sera accedida
+
+  return (
+      <TaskContext.Provider value={x}> {/*creamos ese componente global -contexto naranja- y le pasamos la propiedad value c/el valor d variable a compartir*/}
+        {props.children}     {/* componente  <App /> -contiende la apliacion -*/}
+      </TaskContext.Provider>
+  );
+}
+
+[main]
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+import { TaskContextProvider } from "./context/TaskContext"; // componente global
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <TaskContextProvider>   
+      <App />
+    </TaskContextProvider>
+  </React.StrictMode>
+);
+
+[TaskCard]
+
+function TaskCard({ task, deleteTask }) {
+  // recibe los objetos de funcion map del array tasks (estructuando un props) por eso { lo que queremos}, en lugar de poner props.task
+
+  return (
+    <div>
+      <h1>{task.title}</h1>
+      <p>{task.description}</p>
+      <button onClick={() => deleteTask(task.id)}>Eliminar tarea</button>
+    </div>
+  );
+}
+
+export default TaskCard;
+
+
+[TaskList]
+
+import TaskCard from "./TaskCard";
+
+function TaskList({ tasks, deleteTask }) {
+  // recibe el array de objetos tasks
+  if (tasks.length === 0) {
+    return <h1>No hay tareas aun</h1>;
+  }
+
+  return (
+    <div>
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} deleteTask={deleteTask} /> // key c/elemento y envio objetos
+      ))}
+    </div>
+  );
+}
+
+export default TaskList;
+
+
+[App]
+
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+import { tasks as data } from "./data/tasks";
+import { useState, useEffect } from "react";
+
+function App() {
+  const [tasks, setTasks] = useState([]); // nuevo array tasks vacio
+
+  useEffect(() => {
+    setTasks(data); // se llena el array con los datos del array original
+  }, []); // solo se ejecuta una vez c/carga el componente
+
+  function createTask(task) {
+    // recibe objeto c/propiedades
+    setTasks([
+      // las agrega al array de objetos
+      ...tasks, // existente en un nuevo objeto
+      {
+        title: task.title,
+        id: tasks.length,
+        description: task.description,
+      },
+    ]);
+  }
+
+  function deleteTask(taskId) {
+    setTasks(tasks.filter((task) => task.id !== taskId)); // true se queda
+  }
+
+  return (
+    <div>
+      <TaskForm createTask={createTask} /> {/* se envia funcion */}
+      {/* se envia arreglo tasks */}
+      <TaskList tasks={tasks} deleteTask={deleteTask} />{" "}
+    </div>
+  );
+}
+
+export default App;
+
+
